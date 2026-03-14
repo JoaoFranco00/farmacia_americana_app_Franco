@@ -33,16 +33,18 @@
 ---
 
 ## [Épico 03] Inteligência de Atendimento — Chatbot Lumi (IA & Chat)
-> O diferencial competitivo do produto. Substitui o atendimento repetitivo humano por uma IA contextual e rastreável.
+> O diferencial competitivo do produto. Automatiza dúvidas recorrentes e encaminha casos complexos para o farmacêutico, sem realizar indicações de medicamentos.
 
 | ID | User Story | Prioridade |
 |----|-----------|------------|
-| US-13 | **Como** cliente, **quero** conversar com o chatbot Lumi em linguagem natural, **para** tirar dúvidas sobre medicamentos sem precisar falar com um atendente. | Alta |
-| US-14 | **Como** cliente, **quero** perguntar ao Lumi "o que posso tomar para dor de cabeça?", **para** receber sugestões seguras de MIPs sem automedicação perigosa. | Alta |
-| US-15 | **Como** cliente, **quero** que o Lumi me avise quando meus sintomas exigem consulta médica, **para** não me arriscar com automedicação em casos sérios. | Alta |
-| US-16 | **Como** cliente, **quero** que cada sessão de chat gere um número de protocolo, **para** poder retomar o atendimento com um farmacêutico humano sem repetir as informações. | Alta |
-| US-17 | **Como** atendente, **quero** receber o protocolo da conversa com o contexto completo, **para** dar continuidade ao atendimento de forma ágil e informada. | Alta |
-| US-18 | **Como** cliente, **quero** conseguir fechar meu pedido e pagar diretamente no chat com o Lumi, **para** não precisar sair da conversa para finalizar a compra. | Média |
+| US-13 | **Como** cliente, **quero** conversar com o chatbot Lumi em linguagem natural, **para** tirar dúvidas sobre medicamentos e atendimento sem precisar falar com um atendente. | Alta |
+| US-14 | **Como** cliente, **quero** que o Lumi reconheça automaticamente minhas dúvidas frequentes — como horário de funcionamento ou modo de uso de um medicamento — **para** receber uma resposta imediata sem esperar atendimento humano. | Alta |
+| US-15 | **Como** cliente, **quero** que o Lumi me informe orientações básicas de posologia e armazenamento dos meus medicamentos, **para** usá-los corretamente sem precisar ligar para a farmácia. | Alta |
+| US-16 | **Como** cliente, **quero** ser encaminhado automaticamente para um atendente quando minha dúvida for complexa ou exigir indicação de remédio, **para** receber um atendimento qualificado sem ter que repetir minha situação do zero. | Alta |
+| US-17 | **Como** cliente, **quero** que cada sessão de chat gere um número de protocolo, **para** poder retomar o atendimento com um farmacêutico humano sem repetir as informações. | Alta |
+| US-18 | **Como** atendente, **quero** receber o protocolo da conversa com o contexto completo, **para** dar continuidade ao atendimento de forma ágil e informada. | Alta |
+| US-19 | **Como** administrador, **quero** adicionar e editar perguntas e respostas na base de dúvidas frequentes do Lumi, **para** manter o chatbot atualizado sem precisar republicar o app. | Média |
+| US-20 | **Como** cliente, **quero** conseguir fechar meu pedido e pagar diretamente no chat com o Lumi, **para** não precisar sair da conversa para finalizar a compra. | Média |
 
 ---
 
@@ -51,12 +53,12 @@
 
 | ID | User Story | Prioridade |
 |----|-----------|------------|
-| US-19 | **Como** cliente, **quero** fotografar minha receita médica pelo app, **para** não precisar digitar cada medicamento manualmente. | Alta |
-| US-20 | **Como** cliente, **quero** que o sistema extraia os nomes dos medicamentos da receita fotografada e os adicione ao meu carrinho, **para** agilizar minha compra. | Alta |
-| US-21 | **Como** cliente, **quero** que o sistema me avise se a receita está vencida ou ilegível, **para** evitar erros na minha compra. | Alta |
-| US-22 | **Como** cliente, **quero** que o app verifique a disponibilidade dos medicamentos da receita em estoque antes de montar o carrinho, **para** não ser surpreendido com itens indisponíveis no checkout. | Alta |
-| US-23 | **Como** sistema, **quero** bloquear a adição de medicamentos controlados ao carrinho sem validação prévia de receita, **para** garantir conformidade legal e segurança do paciente. | Alta |
-| US-24 | **Como** atendente, **quero** que o sistema reserve os itens identificados na receita por 30 minutos, **para** ter tempo de confirmar o pedido sem perder o estoque para outra venda. | Média |
+| US-21 | **Como** cliente, **quero** fotografar minha receita médica pelo app, **para** não precisar digitar cada medicamento manualmente. | Alta |
+| US-22 | **Como** cliente, **quero** que o sistema extraia os nomes dos medicamentos da receita fotografada e os adicione ao meu carrinho, **para** agilizar minha compra. | Alta |
+| US-23 | **Como** cliente, **quero** que o sistema me avise se a receita está vencida ou ilegível, **para** evitar erros na minha compra. | Alta |
+| US-24 | **Como** cliente, **quero** que o app verifique a disponibilidade dos medicamentos da receita em estoque antes de montar o carrinho, **para** não ser surpreendido com itens indisponíveis no checkout. | Alta |
+| US-25 | **Como** sistema, **quero** bloquear a adição de medicamentos controlados ao carrinho sem validação prévia de receita, **para** garantir conformidade legal e segurança do paciente. | Alta |
+| US-26 | **Como** atendente, **quero** que o sistema reserve os itens identificados na receita por 30 minutos, **para** ter tempo de confirmar o pedido sem perder o estoque para outra venda. | Média |
 
 ---
 
@@ -65,10 +67,10 @@
 
 | ID | User Story | Prioridade |
 |----|-----------|------------|
-| US-25 | **Como** cliente, **quero** pagar meu pedido via PIX, **para** concluir a compra de forma instantânea sem precisar de cartão. | Alta |
-| US-26 | **Como** cliente, **quero** pagar meu pedido com cartão de crédito, **para** ter a opção de parcelamento. | Alta |
-| US-27 | **Como** cliente, **quero** cadastrar meu endereço de entrega no checkout, **para** receber meu pedido sem precisar ir à farmácia. | Alta |
-| US-28 | **Como** cliente, **quero** receber uma confirmação do meu pedido após o pagamento, **para** ter segurança de que a compra foi registrada. | Alta |
+| US-27 | **Como** cliente, **quero** pagar meu pedido via PIX, **para** concluir a compra de forma instantânea sem precisar de cartão. | Alta |
+| US-28 | **Como** cliente, **quero** pagar meu pedido com cartão de crédito, **para** ter a opção de parcelamento. | Alta |
+| US-29 | **Como** cliente, **quero** cadastrar meu endereço de entrega no checkout, **para** receber meu pedido sem precisar ir à farmácia. | Alta |
+| US-30 | **Como** cliente, **quero** receber uma confirmação do meu pedido após o pagamento, **para** ter segurança de que a compra foi registrada. | Alta |
 
 ---
 
@@ -77,10 +79,10 @@
 
 | ID | User Story | Prioridade |
 |----|-----------|------------|
-| US-29 | **Como** paciente crônico, **quero** ver o histórico completo dos meus pedidos com status, **para** acompanhar minhas compras recorrentes. | Alta |
-| US-30 | **Como** paciente crônico, **quero** receber uma notificação push quando meu medicamento de uso contínuo estiver prestes a acabar, **para** não interromper meu tratamento por falta de estoque. | Alta |
-| US-31 | **Como** paciente crônico, **quero** repetir um pedido anterior com um único toque, **para** economizar tempo na recompra de medicamentos de uso regular. | Alta |
-| US-32 | **Como** cliente, **quero** editar meu endereço e número de telefone na seção "Conta", **para** manter meus dados de entrega sempre atualizados. | Média |
+| US-31 | **Como** paciente crônico, **quero** ver o histórico completo dos meus pedidos com status, **para** acompanhar minhas compras recorrentes. | Alta |
+| US-32 | **Como** paciente crônico, **quero** receber uma notificação push quando meu medicamento de uso contínuo estiver prestes a acabar, **para** não interromper meu tratamento por falta de estoque. | Alta |
+| US-33 | **Como** paciente crônico, **quero** repetir um pedido anterior com um único toque, **para** economizar tempo na recompra de medicamentos de uso regular. | Alta |
+| US-34 | **Como** cliente, **quero** editar meu endereço e número de telefone na seção "Conta", **para** manter meus dados de entrega sempre atualizados. | Média |
 
 ---
 
