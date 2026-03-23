@@ -92,6 +92,28 @@ class WelcomeScreen extends StatelessWidget {
                         ),
                       ),
                     ),
+                    const SizedBox(height: 20),
+
+                    GestureDetector(
+                      onTap: () {},
+                      child: const Text(
+                        'Entrar como visitante',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Pallete.textColor,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 30),
+
+                    const Text(
+                      'versão do aplicativo: 1.0.0',
+                      style: TextStyle(fontSize: 12, color: Pallete.textColor),
+                    ),
+
+                    const SizedBox(height: 20),
                   ],
                 ),
               ],
