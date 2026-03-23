@@ -11,11 +11,17 @@ class RegisterScreen extends StatefulWidget {
 class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
       backgroundColor: Pallete.backgroundColor,
-      body: SafeArea(
-        child: SizedBox.expand(),
+      appBar: AppBar(
+        backgroundColor: Pallete.backgroundColor,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new, color: Color(0xFF1A1A1A)),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
       ),
+      body: const SafeArea(child: SizedBox.expand()),
     );
   }
 }
