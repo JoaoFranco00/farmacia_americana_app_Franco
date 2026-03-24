@@ -1,17 +1,10 @@
-import 'package:farmacia_app/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:farmacia_app/pallete.dart';
-import 'package:farmacia_app/splash_screen.dart';
-// import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:farmacia_app/app_routes.dart';
 
 void main() {
-  
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const MaterialApp(
-    debugShowCheckedModeBanner: false,
-    title: 'Splash',
-    home: SplashScreen(),
-  ));
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -20,12 +13,14 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Login',
+      title: 'Drogaria Americana Saúde',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData.dark().copyWith(
+      theme: ThemeData.light().copyWith(
         scaffoldBackgroundColor: Pallete.backgroundColor,
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFFE31E24)),
       ),
-      home: const LoginScreen(),
+      initialRoute: AppRoutes.splash,
+      routes: AppRoutes.routes,
     );
   }
 }
