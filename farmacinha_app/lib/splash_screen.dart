@@ -1,5 +1,5 @@
-import 'package:farmacia_app/login_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:farmacia_app/app_routes.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -50,9 +50,7 @@ class _SplashScreenState extends State<SplashScreen>
 
     Future.delayed(const Duration(seconds: 3), () {
       if (mounted) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const LoginScreen()),
-        );
+       Navigator.of(context).pushReplacementNamed(AppRoutes.welcome);
       }
     });
   }
@@ -84,12 +82,12 @@ class _SplashScreenState extends State<SplashScreen>
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        const Text(
           'DROGARIA',
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w700,
-            color: const Color(0xFFE31E24),
+            color: Color(0xFFE31E24),
             letterSpacing: 6,
           ),
         ),
@@ -98,9 +96,9 @@ class _SplashScreenState extends State<SplashScreen>
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Text(
+            const Text(
               'AMERIC',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 52,
                 fontWeight: FontWeight.w900,
                 color: Color(0xFF1A1A1A),
@@ -120,9 +118,9 @@ class _SplashScreenState extends State<SplashScreen>
                 ),
               ),
             ),
-            Text(
+            const Text(
               'NA',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 52,
                 fontWeight: FontWeight.w900,
                 color: Color(0xFF1A1A1A),
@@ -131,14 +129,14 @@ class _SplashScreenState extends State<SplashScreen>
             ),
           ],
         ),
-        Align(
+        const Align(
           alignment: Alignment.centerRight,
           child: Text(
             'SAÚDE',
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w700,
-              color: const Color(0xFFE31E24),
+              color: Color(0xFFE31E24),
               letterSpacing: 5,
             ),
           ),
