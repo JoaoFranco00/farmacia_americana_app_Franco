@@ -1,79 +1,93 @@
-# Requisitos Funcionais (RF)
-> **O que o sistema deve fazer para ser considerado funcional.**
-> Documento vivo — versão alinhada à Proposta de Solução do Ecossistema Digital da Farmácia Americana.
+# Requisitos Funcionais (RF) — Ecossistema Farmácia Americana
+
+Este documento detalha as funcionalidades que o sistema deve oferecer para atender aos usuários e às regras de negócio estabelecidas.
 
 ---
 
-## MVP 1: Jornada de Compra e Catálogo
+## 1. Módulo do Cliente (Interface Mobile Flutter)
 
-### RF01 - Catálogo Dinâmico
-O sistema deve listar produtos com nome, imagem, preço, categoria e disponibilidade em estoque em tempo real.
+**RF01 — Cadastro e Autenticação de Usuário**
+O sistema deve permitir que o cliente realize o registro e login utilizando CPF, e-mail e senha.
 
-### RF02 - Busca Inteligente
-O usuário deve conseguir pesquisar itens por nome, princípio ativo ou categoria, com suporte a autocompletar e tolerância a erros ortográficos básicos.
+**RF02 — Catálogo de Produtos e Busca**
+O sistema deve exibir produtos com fotos, descrições e preços, permitindo a navegação por categorias e a busca por texto (nome do produto ou fabricante).
 
-### RF03 - Carrinho de Compras
-O sistema deve permitir adicionar, remover e alterar quantidades de produtos, exibindo subtotal atualizado dinamicamente.
+**RF03 — Chat Híbrido Automático**
+O sistema deve prover uma interface de chat nativa onde o cliente interage com a IA para tirar dúvidas, consultar posologia e selecionar itens.
 
-### RF04 - Gestão de Categorias
-O app deve segmentar produtos em, no mínimo: MIPs (Medicamentos Isentos de Prescrição), Suplementos, Higiene, Medicamentos Controlados e Cuidados Infantis.
+**RF04 — Transbordo de Atendimento**
+O sistema deve permitir que o cliente solicite ou seja transferido automaticamente para um atendente humano caso a IA não consiga resolver a demanda.
 
-### RF05 - Recomendações Sazonais
-A Home deve exibir um bloco de produtos em destaque baseado em sazonalidade e relevância local (ex: antialérgicos no inverno), atualizado pela equipe ou por regras automatizadas.
+**RF05 — Seleção de Produtos via Chat**
+O sistema deve permitir que o cliente adicione produtos ao carrinho de compras diretamente pela interface de conversa, sem necessidade de navegar pelo catálogo manual.
 
----
+**RF06 — Upload de Receita Médica**
+O sistema deve permitir o envio de fotos de receitas médicas diretamente no chat para a validação de medicamentos controlados.
 
-## MVP 2: Atendimento e IA (O Diferencial)
+**RF07 — Checkout e Pagamento Remoto (PIX)**
+O sistema deve gerar chaves PIX dinâmicas com tempo de expiração de 10 minutos para finalização da compra de forma remota.
 
-### RF06 - Chatbot de Atendimento (Lumi)
-O sistema deve disponibilizar uma interface de chat com IA Generativa capaz de reconhecer dúvidas frequentes dos clientes e responder automaticamente com orientações básicas sobre medicamentos (posologia, modo de uso e cuidados gerais de armazenamento), em linguagem natural, sem realizar indicações ou diagnósticos médicos.
+**RF08 — Seleção de Pagamento Presencial**
+O sistema deve permitir que o cliente opte pelo pagamento em dinheiro ou cartão no momento da entrega física dos produtos.
 
-### RF07 - Reconhecimento de Dúvidas Frequentes
-O Lumi deve identificar automaticamente perguntas recorrentes dos clientes — como dúvidas sobre horário de funcionamento, disponibilidade de produtos, formas de pagamento e orientações gerais de uso de medicamentos — e respondê-las sem necessidade de intervenção humana.
+**RF09 — Rastreamento de Pedido**
+O sistema deve exibir em tempo real o status do pedido (Aprovado, Em Separação, Saiu para Entrega) e o histórico de atualizações.
 
-### RF08 - Encaminhamento de Casos Complexos
-Quando o Lumi identificar que uma dúvida ou situação ultrapassa o escopo das orientações básicas — como questões clínicas, interações medicamentosas, necessidade de indicação de remédio ou reclamações — o sistema deve encaminhar o atendimento automaticamente para um atendente humano, repassando o protocolo com o histórico completo da conversa.
-
-### RF09 - OCR de Receitas
-O usuário deve poder fotografar ou fazer upload de uma receita médica; o sistema deve extrair o texto via IA (Vision/OCR), identificar os medicamentos listados e verificar a disponibilidade no estoque, adicionando-os automaticamente ao carrinho.
-
-### RF10 - Validação de Receita por IA
-O sistema deve analisar a receita fotografada para verificar indicadores de validade (data de emissão, assinatura/CRM do prescritor) e exibir um alerta caso a receita esteja potencialmente vencida ou ilegível.
-
-### RF11 - Trava de Segurança para Controlados
-Medicamentos da categoria "Controlados" somente devem ser adicionados ao carrinho mediante validação prévia da receita via OCR. O fluxo de compra desses itens deve ser bloqueado sem essa etapa.
-
-### RF12 - Protocolo de Atendimento
-Cada sessão de chat iniciada pelo usuário deve gerar um número de protocolo único e rastreável, permitindo que o farmacêutico dê continuidade ao atendimento com contexto completo, se necessário.
-
-### RF13 - Pagamento Conversacional
-O usuário deve conseguir iniciar e concluir o processo de pagamento diretamente pela interface de chat, sem necessidade de navegar para outra tela.
+**RF10 — Gestão de Perfil e Histórico**
+O sistema deve permitir que o cliente visualize suas compras anteriores, receitas enviadas e realize a alteração de seus dados cadastrais.
 
 ---
 
-## MVP 3: Checkout, Conta e Recorrência
+## 2. Módulo de Atendimento (Atendente e Farmacêutico)
 
-### RF14 - Métodos de Pagamento
-O sistema deve oferecer pagamento via PIX e Cartão de Crédito, integrados a uma API de pagamentos de terceiros.
+**RF11 — Gestão de Fila de Conversas**
+O sistema deve listar os chats ativos em um painel administrativo, permitindo filtros por data (dia/mês/ano) e status do atendimento (IA ou Humano).
 
-### RF15 - Cadastro e Autenticação
-O sistema deve permitir criação de conta com e-mail, número de telefone e CPF, além de opção de login social via conta Google. O cadastro completo deve ser obrigatório para finalizar uma compra.
+**RF12 — Visualização de Histórico do Cliente**
+O sistema deve permitir a busca de perfis de clientes por CPF, e-mail ou nome para acessar o histórico completo de compras e logs de conversas anteriores.
 
-### RF16 - Perfil e Gerenciamento de Conta
-O usuário deve poder visualizar e editar seus dados cadastrais (endereço de entrega, telefone) e preferências dentro da seção "Conta".
+**RF13 — Validação Técnica de Receita**
+O sistema deve fornecer uma tela para o farmacêutico visualizar o contexto da compra e a imagem da receita enviada. O sistema deve permitir:
+* Aprovar o item para continuidade da venda;
+* Não aprovar o item, tornando obrigatória a inserção de uma nota de explicação que será enviada automaticamente ao cliente através do chat.
 
-### RF17 - Histórico de Compras
-O sistema deve registrar e exibir o histórico completo de pedidos do usuário, com status de cada pedido (em preparo, enviado, entregue).
+**RF14 — Edição de Catálogo e Estoque**
+O sistema deve permitir que usuários autorizados realizem a alteração de preços, descrições e a atualização do saldo de estoque dos produtos por unidade.
 
-### RF18 - Predição de Recompra (Ciclo de Saúde)
-Para medicamentos de uso contínuo identificados no histórico, o sistema deve calcular o ciclo de uso e enviar uma notificação push proativa ao usuário antes do término estimado do estoque pessoal, oferecendo repetição do pedido com um único toque.
-
-### RF19 - Consentimento LGPD
-No momento do cadastro, o sistema deve exibir os Termos de Uso e a Política de Privacidade, exigindo aceite explícito antes de prosseguir. O usuário deve poder revogar o consentimento de uso de dados de saúde a qualquer momento pela seção "Conta".
+**RF15 — Registro de Dados de Venda (API/BD)**
+O sistema deve persistir obrigatoriamente no banco de dados o log do chat, imagem da receita, CRM do validador, CRM/UF do médico e CPF do comprador.
 
 ---
 
-> **Legenda de MVPs:**
-> - **MVP 1** — Fundação do e-commerce (catálogo, busca, carrinho).
-> - **MVP 2** — Diferencial competitivo (IA, OCR, chatbot).
-> - **MVP 3** — Monetização e retenção (checkout, perfil, recorrência).
+## 3. Módulo de Gestão (Gerente, Dono e Administrador)
+
+**RF16 — Geração de Relatórios de Vendas**
+O sistema deve emitir relatórios detalhados de faturamento e lista de produtos mais vendidos por unidade e período.
+
+**RF17 — Dashboards de Indicadores (BI)**
+O sistema deve exibir gráficos de ticket médio, taxa de recorrência de clientes e métricas de performance da IA.
+
+**RF18 — Controle de Acessos (RBAC)**
+O sistema deve permitir ao administrador configurar e gerenciar as permissões de acesso para cada perfil de usuário (Atendente, Farmacêutico, Gerente e Dono).
+
+**RF19 — Configuração de Logística**
+O sistema deve permitir a definição do raio de entrega (em quilômetros) permitido para cada unidade física da farmácia.
+
+**RF20 — Gestão de Configurações da IA**
+O sistema deve permitir o ajuste de parâmetros de resposta, base de conhecimento e gatilhos de transbordo da inteligência artificial.
+
+---
+
+## 4. Funcionalidades de Sistema (Automatismos e Integrações)
+
+**RF21 — Extração de Dados via OCR**
+O sistema deve processar imagens de receitas médicas para extrair automaticamente dados do médico (CRM/UF) e do medicamento para auxílio na conferência técnica.
+
+**RF22 — Confirmação Automática de PIX**
+O sistema deve integrar-se via Webhook com o gateway de pagamento para confirmar transações PIX de forma automática.
+
+**RF23 — Notificações Push**
+O sistema deve disparar alertas automáticos ao cliente sobre mudanças de status de pedidos, novas mensagens no chat e notificações de erro/reprovação de receitas.
+
+**RF24 — Auditoria de Logs Técnicos**
+O sistema deve gerar logs persistentes de todas as orientações técnicas e farmacêuticas fornecidas pela IA aos clientes.
