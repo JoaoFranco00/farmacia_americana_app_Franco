@@ -58,6 +58,8 @@
 | UC15 | Navegar no Catálogo e Consultar Produto | Operação | RF02 | — | RNF01, RNF09 |
 | UC16 | Receber e Processar Notificação Push | Logística | RF23 | RN13 | RNF13 |
 
+<img width="1005" height="872" alt="image" src="https://github.com/user-attachments/assets/efa219cf-a260-40c1-a2ae-1c8e8e64a7c5" />
+
 ---
 
 ## UC01 — Realizar Venda
