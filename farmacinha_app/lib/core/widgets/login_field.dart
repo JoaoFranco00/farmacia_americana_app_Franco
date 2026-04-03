@@ -3,7 +3,7 @@ import '../palette/pallete.dart';
 
 class LoginField extends StatelessWidget {
   final String hintText;
-  const LoginField({super.key, required this.hintText});
+  const LoginField({super.key, required this.hintText, required TextEditingController controller});
 
   @override
   Widget build(BuildContext context) {

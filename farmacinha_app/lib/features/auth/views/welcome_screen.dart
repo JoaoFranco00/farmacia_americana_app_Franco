@@ -25,7 +25,7 @@ class WelcomeScreen extends StatelessWidget {
                   width: 260,
                   fit: BoxFit.contain,
                 ),
-                
+
                 const Column(
                   children: [
                     Text(
@@ -39,10 +39,7 @@ class WelcomeScreen extends StatelessWidget {
                     SizedBox(height: 8),
                     Text(
                       'Acesse sua conta ou crie sua conta',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Pallete.textColor,
-                      ),
+                      style: TextStyle(fontSize: 14, color: Pallete.textColor),
                     ),
                   ],
                 ),

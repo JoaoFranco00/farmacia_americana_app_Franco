@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:farmacia_app/app/app_routes.dart';
 
 class WelcomeViewModel extends ChangeNotifier {
-  
   void navigateToLogin(BuildContext context) {
     Navigator.of(context).pushNamed(AppRoutes.login);
   }

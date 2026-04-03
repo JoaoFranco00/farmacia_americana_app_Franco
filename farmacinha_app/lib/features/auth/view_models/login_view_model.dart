@@ -21,10 +21,11 @@ class LoginViewModel extends ChangeNotifier {
   }
 
   Future<void> login() async {
-    // Aqui entrará a chamada para o repository no futuro
     final email = emailController.text;
     final password = passwordController.text;
-    debugPrint("Logando com $email e Senha: $password");
+    
+    // Variável utilizada para evitar Warnings de POO
+    debugPrint("Tentativa de login - Usuário: $email | Senha: $password");
   }
 
   @override

@@ -14,8 +14,16 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  // Instanciando a ViewModel (em um app real, usaríamos injeção de dependência)
+  // Instanciando a ViewModel
   final LoginViewModel viewModel = LoginViewModel();
+
+  @override
+  void dispose() {
+    // É essencial descartar a ViewModel para fechar os TextEditingControllers
+    viewModel.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,9 +45,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 50),
 
-                  const LoginField(
+                  // CORREÇÃO: Removido 'const' e adicionado o controller
+                  LoginField(
                     hintText: 'Email',
-                    // controller: viewModel.emailController, // Adicione o controller no seu LoginField
+                    controller: viewModel.emailController,
                   ),
                   const SizedBox(height: 16),
 
@@ -81,7 +90,11 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
 
                   const SizedBox(height: 30),
-                  const GradientButton(), // Aqui você pode passar o viewModel.login no onPressed futuro
+                  
+                  // Chamando a função de login da ViewModel
+                  GradientButton(
+                    onPressed: () => viewModel.login(),
+                  ),
 
                   const SizedBox(height: 52),
                   const Text(
@@ -99,7 +112,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     iconColor: Pallete.googleLogo,
                     textColor: Pallete.textColor,
                     horizontalPadding: 80.0,
-                    onPressed: () {},
+                    onPressed: () {
+                      debugPrint("Login Social Google");
+                    },
                   ),
                   const SizedBox(height: 25),
                   SocialButton(
@@ -107,7 +122,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     iconColor: Pallete.facebookLogo,
                     label: 'Entrar com Facebook',
                     textColor: Pallete.textColor,
-                    onPressed: () {},
+                    onPressed: () {
+                      debugPrint("Login Social Facebook");
+                    },
                   ),
                   const SizedBox(height: 25),
                 ],
