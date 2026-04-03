@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:farmacia_app/core/palette/pallete.dart';
 import 'package:farmacia_app/core/widgets/login_field.dart';
-import 'package:farmacia_app/core/widgets/social.button.dart';
+import 'package:farmacia_app/core/widgets/social_button.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});

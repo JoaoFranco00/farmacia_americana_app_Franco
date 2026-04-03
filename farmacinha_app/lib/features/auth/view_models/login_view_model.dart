@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class AuthViewModel extends ChangeNotifier {
+class LoginViewModel extends ChangeNotifier {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
@@ -20,9 +20,11 @@ class AuthViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void login() {
-    // Lógica de login futura
-    debugPrint("Tentando login com: ${emailController.text}");
+  Future<void> login() async {
+    // Aqui entrará a chamada para o repository no futuro
+    final email = emailController.text;
+    final password = passwordController.text;
+    debugPrint("Logando com $email e Senha: $password");
   }
 
   @override
