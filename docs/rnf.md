@@ -1,76 +1,71 @@
-# Requisitos Não Funcionais (RNF)
-> **Como o sistema deve se comportar — qualidade, restrições e atributos de operação.**
-> Documento vivo — versão alinhada à Proposta de Solução do Ecossistema Digital da Farmácia Americana.
+# Requisitos Não Funcionais (RNF) — Ecossistema Farmácia Americana
+
+Este documento estabelece os critérios de qualidade, segurança, performance e padrões técnicos que o sistema deve cumprir para garantir uma operação robusta e escalável.
 
 ---
 
-## Segurança
+## 1. Desempenho e Escalabilidade
 
-### RNF01 - Proteção de Dados Sensíveis (LGPD)
-Os dados de saúde, CPF e informações de pagamento devem ser criptografados em trânsito (TLS 1.2+) e em repouso (AES-256), seguindo integralmente a Lei Geral de Proteção de Dados (Lei nº 13.709/2018).
+**RNF01 — Performance de Interface (Flutter)**
+O aplicativo deve manter uma taxa de atualização de 60 FPS (quadros por segundo) estáveis em dispositivos homologados, garantindo transições fluidas e ausência de travamentos (*jank*).
 
-### RNF02 - Autenticação Segura
-O sistema deve implementar autenticação via tokens JWT com expiração configurável. O login social (Google) deve ser gerenciado por OAuth 2.0. Dados de senha nunca devem ser armazenados em texto puro.
+**RNF02 — Tempo de Resposta da IA**
+O processamento da linguagem natural e o retorno da resposta da Inteligência Artificial no chat não devem exceder o tempo máximo de **5 segundos**.
 
-### RNF03 - Controle de Acesso por Função
-O sistema deve diferenciar permissões entre perfis: **Cliente**, **Atendente** e **Administrador**, garantindo que cada perfil acesse apenas os recursos pertinentes à sua função.
+**RNF03 — Capacidade de Carga**
+O backend deve ser dimensionado para suportar no mínimo **150 usuários** simultâneos realizando transações de chat e consultas ao catálogo sem degradação de performance.
 
----
-
-## Performance
-
-### RNF04 - Tempo de Resposta do OCR
-O processamento de OCR em uma receita fotografada não deve exceder **5 segundos** em condições normais de rede (4G/Wi-Fi estável).
-
-### RNF05 - Tempo de Carregamento da Home
-A tela inicial (Home/Sales) deve carregar e exibir o conteúdo principal em no máximo **3 segundos** em conexões 4G.
-
-### RNF06 - Latência do Chatbot
-O Lumi deve retornar a primeira resposta ao usuário em no máximo **4 segundos** após o envio da mensagem, tanto para respostas automáticas de dúvidas frequentes quanto para mensagens de encaminhamento ao atendente.
+**RNF04 — Latência de Sincronização**
+Atualizações críticas feitas no módulo administrativo (como alteração de estoque ou preço) devem ser refletidas no aplicativo do cliente em no máximo **30 segundos**.
 
 ---
 
-## Disponibilidade e Confiabilidade
+## 2. Segurança e Conformidade (Privacidade)
 
-### RNF07 - Uptime do Sistema
-O sistema deve estar operacional pelo menos **99% do tempo** (equivalente a menos de 87,6 horas de inatividade por ano), garantindo continuidade no fluxo de vendas.
+**RNF05 — Criptografia de Dados em Trânsito**
+Toda comunicação entre o aplicativo Flutter e as APIs deve ser realizada obrigatoriamente via protocolo HTTPS com TLS 1.3.
 
-### RNF08 - Tratamento de Falhas
-Em caso de indisponibilidade de serviços externos (API de pagamento, serviço de IA), o sistema deve exibir mensagens de erro claras ao usuário e registrar o incidente em log, sem travar ou fechar o aplicativo inesperadamente.
+**RNF06 — Proteção de Dados Sensíveis (LGPD)**
+Dados sensíveis, incluindo CPF, históricos de saúde e imagens de receitas médicas, devem ser armazenados com criptografia em repouso utilizando o padrão AES-256.
 
----
+**RNF07 — Gestão de Sessão (JWT)**
+A autenticação deve ser baseada em tokens JWT (JSON Web Token) com tempo de expiração de 24 horas para clientes e 8 horas para colaboradores (funcionários/gerentes).
 
-## Portabilidade e Compatibilidade
-
-### RNF09 - Multiplataforma (Flutter)
-O app deve ser desenvolvido em **Flutter**, garantindo performance nativa em Android (versão 8.0+) e iOS (versão 14+) a partir de um único código-fonte.
-
-### RNF10 - Responsividade de Layout
-A interface deve se adaptar corretamente a diferentes tamanhos de tela, desde smartphones compactos (≈ 5") até tablets (≈ 10"), sem quebra de layout ou elementos sobrepostos.
+**RNF08 — Isolamento de Mídia**
+As imagens de receitas médicas devem ser armazenadas em repositórios privados (buckets), com acesso permitido apenas através de URLs temporárias assinadas geradas pelo servidor.
 
 ---
 
-## Escalabilidade e Arquitetura
+## 3. Usabilidade e Acessibilidade
 
-### RNF11 - Escalabilidade do Chatbot
-A arquitetura do módulo de IA (Lumi) deve suportar múltiplos atendimentos simultâneos sem degradação de performance ou perda de contexto de conversa entre sessões distintas — incluindo os fluxos de resposta automática e de encaminhamento para atendente.
+**RNF09 — Responsividade Multiplataforma**
+O código Dart deve garantir que a interface seja adaptável (responsive design) para diferentes tamanhos de tela, variando de smartphones (4 polegadas) a tablets (12.9 polegadas).
 
-### RNF12 - Base de Dúvidas Frequentes Atualizável
-O sistema deve permitir que o Administrador adicione, edite e remova perguntas e respostas da base de conhecimento do Lumi sem necessidade de nova publicação do aplicativo.
+**RNF10 — Design Consistente (Material Design 3)**
+O sistema deve seguir rigorosamente os padrões de Design System definidos, garantindo paridade visual e funcional entre as versões Android e iOS.
 
-### RNF13 - Arquitetura Orientada a Serviços
-O back-end deve ser estruturado em serviços desacoplados (ex: serviço de catálogo, serviço de IA, serviço de pedidos), facilitando a manutenção e a evolução independente de cada módulo.
-
----
-
-## Usabilidade
-
-### RNF14 - Onboarding Intuitivo
-O fluxo de cadastro e primeiro acesso deve ser concluído em no máximo **4 etapas**, com indicadores de progresso visíveis ao usuário.
-
-### RNF15 - Acessibilidade Básica
-O app deve seguir as diretrizes de acessibilidade do Flutter (contraste mínimo de cores, suporte a leitores de tela nativos do Android/iOS) para atender usuários com necessidades visuais.
+**RNF11 — Intuitividade de Atendimento**
+O painel administrativo deve ser projetado para que o atendente consiga concluir o registro de uma venda em no máximo 4 cliques após o recebimento dos dados da receita.
 
 ---
 
-> **Nota:** RNFs são restrições de qualidade que impactam decisões de arquitetura. Cada item acima deve ser considerado como critério de aceitação em pull requests e revisões de sprint.
+## 4. Disponibilidade e Confiabilidade
+
+**RNF12 — Disponibilidade (SLA)**
+O ecossistema (App, Web e APIs) deve garantir um tempo de atividade (Uptime) mínimo de 99,5% ao mês.
+
+**RNF13 — Persistência de Chat Offline**
+Em caso de perda temporária de conexão, o aplicativo Flutter deve enfileirar as mensagens do cliente localmente e sincronizá-las automaticamente assim que a conexão for restabelecida.
+
+---
+
+## 5. Manutenibilidade e Tecnologia
+
+**RNF14 — Padrão de Arquitetura (MVVM)**
+O desenvolvimento do software deve seguir rigorosamente a documentação de estrutura e o padrão de projeto **MVVM (Model-View-ViewModel)** no Flutter, garantindo a separação clara entre lógica de negócio, estados da UI e modelos de dados.
+
+**RNF15 — Precisão do OCR (IA)**
+A inteligência artificial responsável pela extração de dados de receitas deve apresentar uma acurácia mínima de 85% em imagens com condições normais de iluminação.
+
+**RNF16 — Arquitetura de Microserviços**
+O backend deve ser modularizado (microserviços ou módulos isolados) para permitir atualizações independentes na IA sem impactar os módulos de pagamento, catálogo ou autenticação.

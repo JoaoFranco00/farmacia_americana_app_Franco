@@ -1,653 +1,763 @@
-# Casos de Uso (UC)
-> Documento vivo — versão alinhada à Proposta de Solução do Ecossistema Digital da Farmácia Americana.
-> Base: RF, RNF, RN e Backlog — Versões Finais.
+# Casos de Uso (UC) — Ecossistema Farmácia Americana
+
+> Este documento detalha as interações funcionais entre os atores e o sistema, servindo como guia para o desenvolvimento da lógica de negócio no Flutter e Backend.
+>
 
 ---
 
-## UC01 — Realizar Cadastro
+## Índice
 
-### Ator Principal
-Usuário (Cliente)
+### Domínio: Acesso e Identidade
+- [UC10 — Autenticar Usuário](#uc10--autenticar-usuário)
+- [UC11 — Gerenciar Perfil e Conta](#uc11--gerenciar-perfil-e-conta)
+- [UC14 — Gerenciar Acessos e Perfis (RBAC)](#uc14--gerenciar-acessos-e-perfis-rbac)
 
-### Objetivo
-Permitir que um novo usuário crie sua conta na plataforma para acessar as funcionalidades de compra.
+### Domínio: Atendimento
+- [UC04 — Realizar Transbordo de Atendimento](#uc04--realizar-transbordo-de-atendimento)
+- [UC13 — Configurar e Gerenciar IA](#uc13--configurar-e-gerenciar-ia)
 
-### Pré-condições
-- O usuário não deve possuir cadastro ativo com o mesmo CPF ou e-mail.
+### Domínio: Operação
+- [UC01 — Realizar Venda](#uc01--realizar-venda)
+- [UC02 — Identificar ou Cadastrar Cliente](#uc02--identificar-ou-cadastrar-cliente)
+- [UC03 — Consultar e Verificar Estoque](#uc03--consultar-e-verificar-estoque)
+- [UC15 — Navegar no Catálogo e Consultar Produto](#uc15--navegar-no-catálogo-e-consultar-produto)
 
-### Pós-condições
-- Conta criada com sucesso e sessão iniciada automaticamente.
-- Aceite dos Termos de Uso e Política de Privacidade registrado no sistema.
+### Domínio: Regulatório
+- [UC05 — Validar Receita Médica](#uc05--validar-receita-médica)
+- [UC06 — Persistir Dados de Auditoria](#uc06--persistir-dados-de-auditoria)
+
+### Domínio: Financeiro e Logística
+- [UC08 — Processar Pagamento e Confirmar Recebimento](#uc08--processar-pagamento-e-confirmar-recebimento)
+- [UC12 — Rastrear Pedido em Tempo Real](#uc12--rastrear-pedido-em-tempo-real)
+- [UC16 — Receber e Processar Notificação Push](#uc16--receber-e-processar-notificação-push)
+
+### Domínio: Gestão
+- [UC07 — Gerenciar Unidade](#uc07--gerenciar-unidade)
+- [UC09 — Analisar Performance e Auditoria (BI)](#uc09--analisar-performance-e-auditoria-bi)
+
+---
+
+## Cobertura Completa
+
+| UC | Nome | Domínio | RFs | RNs | RNFs |
+|---|---|---|---|---|---|
+| UC01 | Realizar Venda | Operação | RF03, RF05 | RN05, RN07, RN08 | — |
+| UC02 | Identificar ou Cadastrar Cliente | Operação | RF01 | — | — |
+| UC03 | Consultar e Verificar Estoque | Operação | RF14 | RN07 | RNF04 |
+| UC04 | Realizar Transbordo de Atendimento | Atendimento | RF04, RF11 | RN01 | RNF02 |
+| UC05 | Validar Receita Médica | Regulatório | RF06, RF13, RF21 | RN03, RN04, RN06 | RNF15 |
+| UC06 | Persistir Dados de Auditoria | Regulatório | RF15, RF24 | RN02, RN05, RN06 | RNF06, RNF08 |
+| UC07 | Gerenciar Unidade | Gestão | RF14, RF19 | RN10 | RNF04 |
+| UC08 | Processar Pagamento e Confirmar Recebimento | Financeiro | RF07, RF08, RF22 | RN08, RN09, RN10 | — |
+| UC09 | Analisar Performance e Auditoria (BI) | Gestão | RF16, RF17 | RN11 | — |
+| UC10 | Autenticar Usuário | Acesso | RF01 | — | RNF05, RNF07 |
+| UC11 | Gerenciar Perfil e Conta | Acesso | RF10 | — | RNF06 |
+| UC12 | Rastrear Pedido em Tempo Real | Logística | RF09, RF23 | RN13 | RNF04 |
+| UC13 | Configurar e Gerenciar IA | Atendimento | RF20, RF24 | RN01, RN02 | RNF02, RNF15, RNF16 |
+| UC14 | Gerenciar Acessos e Perfis (RBAC) | Acesso | RF18 | RN11 | RNF07 |
+| UC15 | Navegar no Catálogo e Consultar Produto | Operação | RF02 | — | RNF01, RNF09 |
+| UC16 | Receber e Processar Notificação Push | Logística | RF23 | RN13 | RNF13 |
+
+<img width="1005" height="872" alt="image" src="https://github.com/user-attachments/assets/efa219cf-a260-40c1-a2ae-1c8e8e64a7c5" />
+
+---
+
+## UC01 — Realizar Venda
+
+| Campo | Descrição |
+|---|---|
+| **Ator(es)** | Atendente, Administrador, IA Americana, Cliente |
+| **Descrição** | Registra a venda de produtos, verificando estoque, calculando valores, processando pagamento e emitindo comprovante. |
+| **Pré-condições** | Usuário autenticado (UC10); Produtos com estoque disponível. |
+| **Pós-condições** | Venda registrada (RN05); Estoque atualizado; Comprovante emitido. |
+| **RFs relacionados** | RF03, RF05 |
+| **RNs relacionadas** | RN05, RN07, RN08 |
 
 ### Fluxo Principal
-1. O usuário acessa a tela de cadastro.
-2. O sistema exibe os campos: nome, e-mail, telefone e CPF.
-3. O usuário preenche os campos e avança.
-4. O sistema exibe os Termos de Uso e a Política de Privacidade.
-5. O usuário aceita os termos.
-6. O sistema valida os dados e verifica se o CPF e o e-mail já estão cadastrados.
-7. O sistema cria a conta e inicia a sessão do usuário.
 
-### Fluxos Alternativos
-- **A1 — CPF já cadastrado:**
-  O sistema exibe mensagem informando que já existe uma conta vinculada ao CPF informado.
+1. O Ator inicia uma nova venda (via Chat IA ou Painel Manual).
+2. Sistema solicita identificação do cliente (inclui **UC02**).
+3. Ator pesquisa e adiciona produtos pelo nome.
+4. Sistema verifica disponibilidade em estoque (inclui **UC03**).
+5. Ator informa as quantidades; Sistema calcula o total.
+6. Sistema verifica necessidade de receita (estende **UC05**).
+7. Atendente/Cliente seleciona forma de pagamento (inclui **UC08**).
+8. Sistema finaliza a venda, atualiza estoque e emite comprovante.
+9. Sistema dispara persistência de dados de auditoria (inclui **UC06**).
 
-- **A2 — E-mail já cadastrado:**
-  O sistema exibe mensagem informando que o e-mail já está em uso e sugere recuperação de acesso.
+### Fluxos Alternativos / Exceções
 
-- **A3 — Usuário não aceita os termos:**
-  O sistema bloqueia a criação da conta e informa que o aceite é obrigatório.
+| ID | Nome | Descrição |
+|---|---|---|
+| **FA01** | Estoque Insuficiente | Sistema bloqueia o item e informa o saldo disponível (RN07). |
+| **FA02** | Pagamento PIX Expirado | Se não confirmado em 10 min, o pedido é cancelado e o estoque é liberado (RN08). |
+| **FA03** | IA Não Resolve Intenção | Após 2 tentativas, o sistema aciona o transbordo automático (estende UC04). |
 
-- **A4 — Cadastro via Google:**
-  O sistema redireciona para o fluxo OAuth 2.0 do Google. Após autenticação, os dados básicos são preenchidos automaticamente e o usuário é direcionado para aceite dos termos.
+### Relacionamentos
 
-### RF Relacionados
-- RF15 - Cadastro e Autenticação
-- RF19 - Consentimento LGPD
+| Tipo | Casos de Uso |
+|---|---|
+| **Include** | UC02 — Identificar ou Cadastrar Cliente |
+| **Include** | UC03 — Consultar e Verificar Estoque |
+| **Include** | UC06 — Persistir Dados de Auditoria |
+| **Include** | UC08 — Processar Pagamento e Confirmar Recebimento |
+| **Extend** | UC05 — Validar Receita Médica (se houver medicamento controlado) |
+| **Extend** | UC04 — Realizar Transbordo de Atendimento (se IA falhar) |
 
-### RNF Relacionados
-- RNF01 - Proteção de Dados Sensíveis (LGPD)
-- RNF02 - Autenticação Segura
-- RNF14 - Onboarding Intuitivo
+### Diagrama de Atividades
 
-### RN Relacionadas
-- RN09 - Cadastro Obrigatório para Compra
-- RN10 - CPF Único por Conta
-- RN11 - Consentimento Explícito para Dados de Saúde
+<img width="350" height="834" alt="image" src="https://github.com/user-attachments/assets/622da48d-a451-4522-a852-6a47fd799568" />
 
 ---
 
-## UC02 — Realizar Login
+## UC02 — Identificar ou Cadastrar Cliente
 
-### Ator Principal
-Usuário (Cliente)
-
-### Objetivo
-Permitir que o usuário acesse o sistema com uma conta já existente.
-
-### Pré-condições
-- O usuário deve possuir cadastro ativo.
-
-### Pós-condições
-- Sessão iniciada com sucesso e usuário redirecionado para a tela inicial (Home).
+| Campo | Descrição |
+|---|---|
+| **Ator(es)** | Atendente, Administrador, IA Americana |
+| **Descrição** | Identifica um cliente existente via CPF ou realiza o registro de um novo usuário para permitir a continuidade da venda. |
+| **Pré-condições** | Usuário autenticado (UC10); Fluxo de venda iniciado. |
+| **Pós-condições** | Cliente vinculado à transação; Dados persistidos no banco de dados. |
+| **RFs relacionados** | RF01 |
+| **RNs relacionadas** | — |
 
 ### Fluxo Principal
-1. O usuário acessa a tela de login.
-2. O usuário informa e-mail e senha.
-3. O sistema valida as credenciais.
-4. O sistema gera um token JWT e inicia a sessão.
-5. O usuário é redirecionado para a Home.
 
-### Fluxos Alternativos
-- **A1 — Senha incorreta:**
-  O sistema exibe mensagem de erro genérica (sem indicar qual campo está errado, por segurança).
+1. O Sistema (ou Atendente) solicita o CPF do cliente.
+2. Atendente insere o CPF no sistema.
+3. Sistema realiza a busca na base de dados centralizada.
+4. Se localizado: Sistema exibe os dados (Nome, Telefone, Endereço) e vincula ao pedido.
+5. Se não localizado: Sistema abre formulário de novo cadastro.
+6. Atendente preenche dados obrigatórios (Nome, E-mail, Telefone).
+7. Sistema valida os dados e confirma o salvamento.
 
-- **A2 — Conta não encontrada:**
-  O sistema exibe mensagem informando que não existe conta com o e-mail informado.
+### Fluxos Alternativos / Exceções
 
-- **A3 — Login via Google:**
-  O sistema redireciona para o fluxo OAuth 2.0 do Google e autentica o usuário automaticamente.
+| ID | Nome | Descrição |
+|---|---|---|
+| **FA01** | CPF Inválido | O sistema identifica erro de dígito verificador, exibe alerta e solicita nova inserção. |
+| **FA02** | Cliente com Restrição | O sistema identifica bloqueio administrativo no perfil do cliente e notifica o Atendente para autorização superior. |
 
-- **A4 — Recuperação de senha:**
-  O usuário solicita recuperação. O sistema envia um link de redefinição para o e-mail cadastrado.
+### Relacionamentos
 
-### RF Relacionados
-- RF15 - Cadastro e Autenticação
+| Tipo | Casos de Uso |
+|---|---|
+| **Include** | Faz parte do UC01 — Realizar Venda |
 
-### RNF Relacionados
-- RNF02 - Autenticação Segura
+### Diagrama de Atividades
 
-### RN Relacionadas
-- RN09 - Cadastro Obrigatório para Compra
+<img width="358" height="422" alt="image" src="https://github.com/user-attachments/assets/574148f2-d573-4bdc-8f3d-b88cfeb56caa" />
 
 ---
 
-## UC03 — Buscar e Navegar pelo Catálogo
+## UC03 — Consultar e Verificar Estoque
 
-### Ator Principal
-Usuário (Cliente)
-
-### Objetivo
-Permitir que o usuário encontre produtos pelo catálogo, seja por busca direta ou navegando por categorias.
-
-### Pré-condições
-- Nenhuma. O catálogo deve ser acessível sem login.
-
-### Pós-condições
-- O usuário visualiza os produtos desejados com informações completas.
+| Campo | Descrição |
+|---|---|
+| **Ator(es)** | Atendente, Administrador, Sistema (Automático) |
+| **Descrição** | Verifica a disponibilidade física de um item na unidade atual antes de permitir sua adição ao carrinho. |
+| **Pré-condições** | Produto identificado por nome ou ID; Unidade física selecionada. |
+| **Pós-condições** | Saldo exibido; Reserva temporária do item realizada. |
+| **RFs relacionados** | RF14 |
+| **RNs relacionadas** | RN07 |
+| **RNFs relacionados** | RNF04 |
 
 ### Fluxo Principal
-1. O usuário acessa a Home ou a tela de Categorias.
-2. O sistema exibe os produtos disponíveis com nome, imagem, preço e status de estoque.
-3. O usuário digita um termo na barra de busca.
-4. O sistema retorna os resultados com autocompletar e tolerância a erros ortográficos.
-5. O usuário seleciona um produto para ver seus detalhes.
 
-### Fluxos Alternativos
-- **A1 — Navegação por Categorias:**
-  O usuário seleciona uma categoria (MIPs, Suplementos, Higiene, Controlados, Infantil). O sistema filtra e exibe apenas os produtos daquela categoria.
+1. Atendente pesquisa o produto durante a venda.
+2. Sistema consulta a tabela de estoque da unidade em tempo real.
+3. Sistema retorna o saldo disponível.
+4. Atendente confirma a adição da quantidade desejada.
+5. Sistema realiza a reserva lógica do item para evitar venda duplicada.
 
-- **A2 — Nenhum resultado encontrado:**
-  O sistema exibe mensagem informando que nenhum produto foi encontrado para o termo pesquisado e sugere termos relacionados.
+### Fluxos Alternativos / Exceções
 
-- **A3 — Produto indisponível:**
-  O sistema exibe o produto mas indica "Indisponível no momento", bloqueando a opção de adicionar ao carrinho.
+| ID | Nome | Descrição |
+|---|---|---|
+| **FA01** | Estoque Zerado | Sistema exibe o item em vermelho, bloqueia a inclusão e sugere consulta em outras unidades próximas. |
+| **FA02** | Quantidade Superior ao Saldo | Sistema limita a inserção ao máximo disponível em estoque (RN07). |
 
-### RF Relacionados
-- RF01 - Catálogo Dinâmico
-- RF02 - Busca Inteligente
-- RF04 - Gestão de Categorias
-- RF05 - Recomendações Sazonais
+### Relacionamentos
 
-### RNF Relacionados
-- RNF05 - Tempo de Carregamento da Home
+| Tipo | Casos de Uso |
+|---|---|
+| **Include** | Faz parte do UC01 — Realizar Venda |
 
-### RN Relacionadas
-- *(Nenhuma restrição de negócio direta para navegação sem compra)*
+### Diagrama de Atividades
+
+<img width="481" height="431" alt="image" src="https://github.com/user-attachments/assets/509daaca-90d3-4ea5-b679-1a8a4e4a495b" />
 
 ---
 
-## UC04 — Gerenciar Carrinho de Compras
+## UC04 — Realizar Transbordo de Atendimento
 
-### Ator Principal
-Usuário (Cliente)
-
-### Objetivo
-Permitir que o usuário monte seu pedido adicionando, ajustando e removendo itens antes do checkout.
-
-### Pré-condições
-- O produto deve estar disponível em estoque.
-
-### Pós-condições
-- Carrinho atualizado e pronto para o fluxo de checkout.
+| Campo | Descrição |
+|---|---|
+| **Ator(es)** | IA Americana, Atendente, Cliente |
+| **Descrição** | Transfere a conversa da IA para um operador humano quando as regras de transbordo são acionadas por falha de intenção ou solicitação explícita do cliente. |
+| **Pré-condições** | Chat ativo; Gatilho de falha da IA (2 tentativas) ou solicitação manual do cliente. |
+| **Pós-condições** | Atendente assume o chat; Log completo da IA preservado e visível para o atendente. |
+| **RFs relacionados** | RF04, RF11 |
+| **RNs relacionadas** | RN01 |
+| **RNFs relacionados** | RNF02 |
 
 ### Fluxo Principal
-1. O usuário seleciona um produto no catálogo e toca em "Adicionar ao Carrinho".
-2. O sistema adiciona o item e atualiza o subtotal em tempo real.
-3. O usuário acessa a tela do Carrinho.
-4. O usuário ajusta quantidades ou remove itens conforme necessário.
-5. O sistema recalcula o subtotal a cada alteração.
-6. O usuário avança para o checkout.
 
-### Fluxos Alternativos
-- **A1 — Tentativa de adicionar Medicamento Controlado:**
-  O sistema bloqueia a adição e redireciona o usuário para o fluxo de envio de receita (UC06) antes de prosseguir.
+1. IA identifica falha na intenção após 2 tentativas consecutivas, ou o cliente solicita atendimento humano (RN01).
+2. Sistema marca a conversa como "Prioridade Alta" na fila de espera.
+3. Atendente visualiza o chamado no painel e aceita o atendimento.
+4. Sistema carrega o histórico completo da conversa para o Atendente.
+5. Atendente assume o diálogo e finaliza o pedido manualmente.
 
-- **A2 — Item esgota durante a sessão:**
-  O sistema notifica o usuário que o item não está mais disponível e o remove automaticamente do carrinho.
+### Fluxos Alternativos / Exceções
 
-### RF Relacionados
-- RF03 - Carrinho de Compras
+| ID | Nome | Descrição |
+|---|---|---|
+| **FA01** | Nenhum Atendente Disponível | Sistema informa o cliente sobre a fila de espera e mantém a IA operando funções básicas enquanto aguarda. |
+| **FA02** | Atendente Recusa o Chamado | Sistema redistribui para o próximo atendente disponível na fila. |
 
-### RNF Relacionados
-- RNF07 - Uptime do Sistema
+### Relacionamentos
 
-### RN Relacionadas
-- RN06 - Trava de Medicamentos Controlados
+| Tipo | Casos de Uso |
+|---|---|
+| **Extend** | Estende UC01 — Realizar Venda (quando IA falha) |
+
+### Diagrama de Atividades
+
+<img width="594" height="483" alt="image" src="https://github.com/user-attachments/assets/2a0e5a4c-8bef-49cd-8508-48244de571fd" />
 
 ---
 
-## UC05 — Interagir com o Chatbot Lumi
+## UC05 — Validar Receita Médica
 
-### Ator Principal
-Usuário (Cliente)
-
-### Objetivo
-Permitir que o usuário tire dúvidas frequentes e receba orientações básicas sobre medicamentos via chat, sendo encaminhado para um atendente humano quando a situação exigir.
-
-### Pré-condições
-- Nenhuma. O chat deve ser acessível sem login para consultas gerais.
-
-### Pós-condições
-- Dúvida do usuário respondida automaticamente ou protocolo gerado e encaminhado ao atendente.
+| Campo | Descrição |
+|---|---|
+| **Ator(es)** | Farmacêutico, Cliente, IA Americana |
+| **Descrição** | Processo de análise de prescrições para liberar medicamentos de controle especial, com pré-leitura por OCR da IA e validação humana obrigatória. |
+| **Pré-condições** | Foto da receita enviada no chat; Item controlado presente no carrinho do UC01. |
+| **Pós-condições** | Venda aprovada ou bloqueada; Registro do CRM do validador persistido (RN06). |
+| **RFs relacionados** | RF06, RF13, RF21 |
+| **RNs relacionadas** | RN03, RN04, RN06 |
+| **RNFs relacionados** | RNF15 |
 
 ### Fluxo Principal
-1. O usuário acessa a tela de Atendimento e inicia uma conversa com o Lumi.
-2. O sistema gera um número de protocolo único para a sessão.
-3. O usuário digita sua dúvida em linguagem natural.
-4. O Lumi identifica se a dúvida se enquadra na base de perguntas frequentes.
-5. O Lumi responde automaticamente com a orientação básica correspondente.
-6. O usuário pode continuar a conversa ou encerrar o atendimento.
 
-### Fluxos Alternativos
-- **A1 — Dúvida não reconhecida como frequente:**
-  O Lumi informa ao usuário que não possui uma resposta automática para aquela situação e oferece encaminhamento para um atendente humano.
+1. Sistema identifica medicamento controlado no carrinho e solicita a imagem da receita ao cliente.
+2. Cliente envia a foto da receita diretamente no chat (RF06).
+3. IA realiza OCR inicial e extrai dados do médico (CRM/UF) e do medicamento para pré-preenchimento (RN03).
+4. Farmacêutico recebe notificação e abre a tela de validação.
+5. Farmacêutico analisa a imagem da receita contra os dados do pedido.
+6. Farmacêutico clica em "Aprovar".
+7. Sistema registra o CRM do Farmacêutico e libera o checkout (RN04, RN06).
 
-- **A2 — Usuário solicita indicação de remédio:**
-  O Lumi informa que não realiza indicações de medicamentos e encaminha automaticamente o atendimento para um farmacêutico, repassando o protocolo com o histórico da conversa.
+### Fluxos Alternativos / Exceções
 
-- **A3 — Caso complexo identificado pela IA:**
-  O Lumi detecta que a dúvida envolve sintomas, interações medicamentosas ou receitas e encaminha automaticamente para um atendente, sem tentar responder.
+| ID | Nome | Descrição |
+|---|---|---|
+| **FA01** | Reprovação com Nota | Farmacêutico clica em "Não Aprovar", insere nota obrigatória (ex: "Receita fora da validade") e o sistema envia ao cliente via chat (RF13). |
+| **FA02** | OCR com Baixa Confiança | IA sinaliza campos não extraídos com confiança abaixo de 85% (RNF15); Farmacêutico preenche manualmente. |
+| **FA03** | Imagem Ilegível | Sistema solicita ao cliente o reenvio da foto em melhor qualidade. |
 
-- **A4 — Usuário solicita falar com atendente:**
-  O sistema encerra a sessão de IA e repassa o protocolo com o histórico completo da conversa para o atendente humano.
+### Relacionamentos
 
-- **A5 — Pagamento pelo chat:**
-  O usuário decide finalizar uma compra dentro do chat. O sistema redireciona para o fluxo de checkout (UC07) sem encerrar a sessão.
+| Tipo | Casos de Uso |
+|---|---|
+| **Extend** | Estende UC01 — Realizar Venda (se houver medicamento controlado) |
+| **Include** | UC06 — Persistir Dados de Auditoria (CRM e imagem da receita) |
 
-### RF Relacionados
-- RF06 - Chatbot de Atendimento (Lumi)
-- RF07 - Reconhecimento de Dúvidas Frequentes
-- RF08 - Encaminhamento de Casos Complexos
-- RF12 - Protocolo de Atendimento
-- RF13 - Pagamento Conversacional
+### Diagrama de Atividades
 
-### RNF Relacionados
-- RNF06 - Latência do Chatbot
-- RNF11 - Escalabilidade do Chatbot
-- RNF12 - Base de Dúvidas Frequentes Atualizável
-
-### RN Relacionadas
-- RN01 - Limite de Atuação da IA
-- RN02 - Proibição de Indicação de Remédios pela IA
-- RN03 - Encaminhamento Obrigatório de Casos Complexos
-- RN05 - Geração Obrigatória de Protocolo
+<img width="521" height="761" alt="image" src="https://github.com/user-attachments/assets/a3d712c9-0dee-433f-a21a-6ae72bcaa7ab" />
 
 ---
 
-## UC06 — Enviar e Processar Receita Médica (OCR)
+## UC06 — Persistir Dados de Auditoria
 
-### Ator Principal
-Usuário (Cliente)
-
-### Objetivo
-Permitir que o usuário fotografe uma receita médica e tenha os medicamentos identificados e adicionados automaticamente ao carrinho.
-
-### Pré-condições
-- O usuário deve estar autenticado.
-- O dispositivo deve ter câmera disponível ou permitir upload de imagem.
-
-### Pós-condições
-- Medicamentos identificados adicionados ao carrinho.
-- Itens reservados no estoque por 30 minutos.
-- Protocolo gerado para rastreabilidade.
+| Campo | Descrição |
+|---|---|
+| **Ator(es)** | Sistema (Automatismo), API de Auditoria |
+| **Descrição** | Realiza a coleta, criptografia e gravação inalterável de todos os dados sensíveis da venda, conversas e validações farmacêuticas para fins de conformidade com a ANVISA e segurança jurídica. |
+| **Pré-condições** | Finalização de uma venda (UC01) ou conclusão de uma validação de receita (UC05); Conexão ativa com o Barramento de Serviços/API. |
+| **Pós-condições** | Registro de auditoria gerado com ID único de protocolo; Logs de chat e imagens de receitas armazenados com criptografia AES-256 (RNF06); Dados de CRM, CPF e metadados vinculados permanentemente à transação. |
+| **RFs relacionados** | RF15, RF24 |
+| **RNs relacionadas** | RN02, RN05, RN06 |
+| **RNFs relacionados** | RNF06, RNF08 |
 
 ### Fluxo Principal
-1. O usuário acessa a opção de envio de receita (via chat ou carrinho).
-2. O usuário fotografa a receita ou faz upload de uma imagem existente.
-3. O sistema envia a imagem para o módulo de OCR com IA.
-4. A IA extrai os nomes dos medicamentos e valida a data de emissão e o CRM do prescritor.
-5. O sistema verifica a disponibilidade de cada medicamento no estoque.
-6. Os medicamentos disponíveis são adicionados ao carrinho e reservados por 30 minutos.
-7. O sistema exibe um resumo ao usuário com os itens identificados.
 
-### Fluxos Alternativos
-- **A1 — Receita ilegível ou leitura parcial:**
-  O sistema informa o usuário que não foi possível processar a receita e transfere o atendimento para um farmacêutico humano com o protocolo da sessão.
+1. O Sistema detecta o gatilho de conclusão no UC01 (Venda) ou UC05 (Validação de Receita).
+2. O Sistema inicia a varredura e coleta dos dados obrigatórios (RN05):
+   - CPF do comprador e lista de SKUs vendidos;
+   - Log completo da sessão de chat (interações IA e Humano);
+   - Binário da imagem da receita médica (se houver item controlado);
+   - Carimbo de tempo (Timestamp) sincronizado com o servidor;
+   - CRM/UF do Médico prescritor e CRM do Farmacêutico validador.
+3. O Sistema aplica criptografia AES-256 nos campos de dados sensíveis (RNF06).
+4. O Sistema realiza uma requisição POST para o endpoint de auditoria da API.
+5. A API valida o esquema dos dados (Schema Validation) e a integridade do payload.
+6. A API persiste os dados em tabelas de log append-only (somente escrita, sem deleção).
+7. O Sistema gera um número de protocolo de auditoria e o vincula ao registro da venda.
 
-- **A2 — Receita vencida:**
-  O sistema identifica que a data de validade expirou, recusa o processamento e exibe mensagem explicativa ao usuário.
+### Fluxos Alternativos / Exceções
 
-- **A3 — Medicamento identificado mas indisponível no estoque:**
-  O sistema informa quais itens não estão disponíveis e adiciona apenas os disponíveis ao carrinho.
+| ID | Nome | Descrição |
+|---|---|---|
+| **FA01** | Falha de Comunicação com a API | O sistema armazena o pacote localmente (SQLite/Hive no Flutter ou Cache no Backend) e ativa rotina de Retry a cada 5 minutos até obter sucesso. |
+| **FA02** | Inconsistência de Dados Obrigatórios | Se detectada ausência de CRM obrigatório para item controlado, a persistência é marcada com "Flag de Erro" e alerta crítico é enviado ao Administrador. |
 
-- **A4 — Reserva expirada sem finalização:**
-  Após 30 minutos, o sistema cancela automaticamente a reserva e libera os itens no estoque.
+### Relacionamentos
 
-### RF Relacionados
-- RF09 - OCR de Receitas
-- RF10 - Validação de Receita por IA
-- RF11 - Trava de Segurança para Controlados
-- RF12 - Protocolo de Atendimento
+| Tipo | Casos de Uso |
+|---|---|
+| **Include** | Executado obrigatoriamente ao final do UC01 e do UC05 |
 
-### RNF Relacionados
-- RNF04 - Tempo de Resposta do OCR
-- RNF01 - Proteção de Dados Sensíveis (LGPD)
+### Diagrama de Atividades
 
-### RN Relacionadas
-- RN06 - Trava de Medicamentos Controlados
-- RN07 - Validade da Receita
-- RN08 - Reserva Temporária de Estoque
-- RN04 - Fluxo de Contingência do OCR
+<img width="467" height="954" alt="image" src="https://github.com/user-attachments/assets/7f0842f2-6ccb-4c31-9492-19c42a838106" />
 
 ---
 
-## UC07 — Finalizar Compra (Checkout)
+## UC07 — Gerenciar Unidade
 
-### Ator Principal
-Usuário (Cliente)
-
-### Objetivo
-Permitir que o usuário conclua seu pedido escolhendo o método de pagamento e confirmando o endereço de entrega.
-
-### Pré-condições
-- O usuário deve estar autenticado e com cadastro completo.
-- O carrinho deve conter ao menos um item disponível.
-
-### Pós-condições
-- Pedido registrado no sistema com status "Aguardando pagamento".
-- Após confirmação do pagamento, status atualizado para "Em preparo".
-- Confirmação enviada ao usuário.
+| Campo | Descrição |
+|---|---|
+| **Ator(es)** | Gerente, Administrador |
+| **Descrição** | Permite a manutenção dos dados operacionais da unidade, incluindo preços, estoque e configurações de logística como raio de entrega. |
+| **Pré-condições** | Perfil Gerente ou superior autenticado (UC10); Unidade selecionada. |
+| **Pós-condições** | Parâmetros atualizados e refletidos no App do cliente em até 30s (RNF04). |
+| **RFs relacionados** | RF14, RF19 |
+| **RNs relacionadas** | RN10, RN11, RN12 |
+| **RNFs relacionados** | RNF04 |
 
 ### Fluxo Principal
-1. O usuário acessa o carrinho e toca em "Finalizar Compra".
-2. O sistema exibe o endereço de entrega cadastrado para confirmação.
-3. O usuário confirma ou edita o endereço.
-4. O sistema exibe as opções de pagamento: PIX ou Cartão de Crédito.
-5. O usuário seleciona o método e conclui o pagamento via API de terceiros.
-6. O sistema aguarda a confirmação da API de pagamento.
-7. Confirmado o pagamento, o sistema registra o pedido como "Em preparo" e envia confirmação ao usuário.
 
-### Fluxos Alternativos
-- **A1 — Usuário não autenticado:**
-  O sistema interrompe o checkout e redireciona para o login/cadastro. Após autenticação, retorna ao carrinho.
+1. Gerente acessa o menu de Configurações da Unidade.
+2. Seleciona o item a alterar: produto, preço ou configuração de logística.
+3. Informa o novo valor.
+4. Sistema valida a permissão do usuário (RN11).
+5. Sistema persiste a alteração no banco de dados.
+6. Sistema propaga a atualização para o app do cliente em até 30s (RNF04).
 
-- **A2 — Falha na API de Pagamento:**
-  O sistema exibe mensagem de erro, mantém o carrinho intacto e orienta o usuário a tentar novamente.
+### Fluxos Alternativos / Exceções
 
-- **A3 — Pagamento via PIX:**
-  O sistema gera o QR Code e o código copia-e-cola. O pedido permanece como "Aguardando pagamento" até a confirmação.
+| ID | Nome | Descrição |
+|---|---|---|
+| **FA01** | Permissão Insuficiente | Sistema exibe erro de permissão e bloqueia a alteração. |
+| **FA02** | Raio de Entrega Inválido | Sistema valida que o valor informado está dentro dos limites configurados pelo Administrador (RN12). |
 
-- **A4 — Reserva de estoque expirada durante o checkout:**
-  O sistema alerta o usuário que um ou mais itens não estão mais reservados e solicita confirmação para tentar nova reserva.
+### Relacionamentos
 
-### RF Relacionados
-- RF14 - Métodos de Pagamento
-- RF15 - Cadastro e Autenticação
-- RF16 - Perfil e Gerenciamento de Conta
+| Tipo | Casos de Uso |
+|---|---|
+| **Extend** | Pode ser acessado a partir do UC14 — Gerenciar Acessos e Perfis (RBAC) |
 
-### RNF Relacionados
-- RNF01 - Proteção de Dados Sensíveis (LGPD)
-- RNF08 - Tratamento de Falhas
+### Diagrama de Atividades
 
-### RN Relacionadas
-- RN09 - Cadastro Obrigatório para Compra
-- RN12 - Confirmação de Pagamento Antes do Processamento
+<img width="594" height="538" alt="image" src="https://github.com/user-attachments/assets/a05641b8-ae4d-40ca-8916-e6976706c0df" />
 
 ---
 
-## UC08 — Receber Notificação e Repetir Pedido Recorrente
+## UC08 — Processar Pagamento e Confirmar Recebimento
 
-### Ator Principal
-Usuário (Cliente — Paciente Crônico)
-
-### Objetivo
-Permitir que o sistema antecipe a necessidade de recompra de medicamentos de uso contínuo e que o usuário repita o pedido com um único toque.
-
-### Pré-condições
-- O usuário deve ter ao menos 2 pedidos anteriores do mesmo medicamento registrados.
-- As notificações push devem estar habilitadas no dispositivo.
-
-### Pós-condições
-- Novo pedido adicionado ao carrinho ou confirmado diretamente.
-- Usuário redirecionado para o checkout.
+| Campo | Descrição |
+|---|---|
+| **Ator(es)** | Cliente, Sistema de Pagamento (Gateway), Atendente (Entregador) |
+| **Descrição** | Gerencia o fluxo financeiro da venda, desde a geração do PIX até a baixa manual em entregas presenciais, encerrando o ciclo financeiro do pedido. |
+| **Pré-condições** | Venda finalizada no UC01; Valor total calculado; Endereço dentro do raio de entrega (RN12). |
+| **Pós-condições** | Status do pedido atualizado para "Pago"; Reserva de estoque convertida em baixa definitiva. |
+| **RFs relacionados** | RF07, RF08, RF22 |
+| **RNs relacionadas** | RN08, RN09, RN10 |
 
 ### Fluxo Principal
-1. O sistema analisa o histórico de compras e detecta um padrão recorrente de medicamento de uso contínuo.
-2. O sistema calcula a data estimada de término do estoque pessoal do usuário.
-3. O sistema dispara uma notificação push com a mensagem de alerta de recompra.
-4. O usuário toca na notificação.
-5. O app abre diretamente com o medicamento pré-adicionado ao carrinho.
-6. O usuário confirma e é redirecionado para o checkout (UC07).
 
-### Fluxos Alternativos
-- **A1 — Usuário ignora a notificação:**
-  Nenhuma ação é tomada. O sistema pode reenviar a notificação após intervalo configurável.
+1. O Sistema solicita a escolha do método de pagamento.
+2. Se PIX: Sistema gera QR Code e chave "Copia e Cola" com validade de 10 min (RN08).
+3. O Gateway de Pagamento envia notificação de sucesso via Webhook (RF22).
+4. Sistema confirma o pagamento no chat do cliente e altera o status para "Em Separação".
+5. Se Presencial (Dinheiro/Cartão): Sistema marca o pedido como "Aguardando Entrega".
+6. O Atendente realiza a entrega física.
+7. O Atendente registra a baixa manual do pagamento no App (RN09).
+8. Sistema encerra o ciclo financeiro e emite o recibo.
 
-- **A2 — Medicamento indisponível no momento da notificação:**
-  A notificação informa a indisponibilidade e sugere ao usuário entrar em contato pelo chat.
+### Fluxos Alternativos / Exceções
 
-- **A3 — Usuário deseja alterar o pedido:**
-  O usuário acessa o carrinho normalmente e ajusta as quantidades antes de finalizar.
+| ID | Nome | Descrição |
+|---|---|---|
+| **FA01** | Pagamento Recusado / Expirado | O sistema notifica o cliente no chat, libera o estoque reservado e oferece nova tentativa ou cancelamento (RN08). |
+| **FA02** | Falha de Conexão no Webhook | O Atendente pode realizar a conferência manual do comprovante PIX para liberar o pedido manualmente. |
+| **FA03** | Endereço Fora do Raio | Sistema bloqueia o checkout e informa o cliente (RN12). |
 
-### RF Relacionados
-- RF17 - Histórico de Compras
-- RF18 - Predição de Recompra (Ciclo de Saúde)
+### Relacionamentos
 
-### RNF Relacionados
-- RNF11 - Escalabilidade do Chatbot
-- RNF07 - Uptime do Sistema
+| Tipo | Casos de Uso |
+|---|---|
+| **Include** | UC06 — Persistir Dados de Auditoria |
+| **Extend** | UC12 — Rastrear Pedido em Tempo Real (após confirmação do pagamento) |
 
-### RN Relacionadas
-- RN13 - Notificação de Recompra Baseada em Ciclo Real
+### Diagrama de Atividades
+
+<img width="594" height="598" alt="image" src="https://github.com/user-attachments/assets/02d598be-e7d1-43f5-8941-c169b6c4805d" />
 
 ---
 
-## UC09 — Gerenciar Perfil e Dados da Conta
+## UC09 — Analisar Performance e Auditoria (BI)
 
-### Ator Principal
-Usuário (Cliente)
-
-### Objetivo
-Permitir que o usuário visualize e edite seus dados cadastrais, endereço de entrega e preferências de privacidade diretamente pela seção "Conta" do app.
-
-### Pré-condições
-- O usuário deve estar autenticado.
-
-### Pós-condições
-- Dados atualizados persistidos no sistema.
-- Alterações refletidas imediatamente nos próximos fluxos de checkout e notificação.
+| Campo | Descrição |
+|---|---|
+| **Ator(es)** | Dono, Administrador, Gerente |
+| **Descrição** | Fornece visão estratégica sobre faturamento, eficiência da IA, produtos mais vendidos e conformidade das receitas validadas, com escopo filtrado pela hierarquia do usuário. |
+| **Pré-condições** | Usuário autenticado com perfil Gerente ou superior (UC10); Dados de vendas disponíveis. |
+| **Pós-condições** | Relatórios e dashboards gerados na interface Flutter Web/Desktop; Arquivo de conformidade exportado (se solicitado). |
+| **RFs relacionados** | RF16, RF17 |
+| **RNs relacionadas** | RN11 |
 
 ### Fluxo Principal
-1. O usuário acessa a seção "Conta" pelo menu inferior.
-2. O sistema exibe os dados cadastrais atuais: nome, e-mail, telefone e endereço de entrega.
-3. O usuário seleciona o campo que deseja editar.
-4. O usuário altera o valor e confirma.
-5. O sistema valida e salva as alterações.
-6. O sistema exibe confirmação visual da atualização.
 
-### Fluxos Alternativos
-- **A1 — Novo telefone já vinculado a outra conta:**
-  O sistema exibe mensagem de conflito e solicita que o usuário informe outro número.
+1. O Usuário acessa o módulo de "Relatórios e Performance".
+2. O Sistema filtra o escopo de dados conforme a hierarquia do perfil (RN11):
+   - Dono: todas as unidades.
+   - Gerente: apenas sua unidade.
+3. O Usuário seleciona o período e tipo de relatório desejado.
+4. O Sistema consulta a base de dados consolidada (inclui dados do UC06).
+5. O Sistema gera as métricas solicitadas:
+   - Faturamento por Unidade/Período (RF16);
+   - Produtos mais vendidos e clientes mais recorrentes (RF16);
+   - Ticket médio e taxa de recorrência (RF17);
+   - Taxa de Transbordo IA vs Humano (RF17);
+   - Volume de Medicamentos Controlados vendidos.
+6. O Usuário exporta os logs de auditoria para fins regulatórios (ANVISA), se necessário.
 
-- **A2 — Usuário deseja revogar consentimento de dados de saúde:**
-  O sistema exibe um aviso explicando as implicações (desativação do histórico de medicamentos e predição de ciclo). Após confirmação, o consentimento é revogado e os dados de saúde são anonimizados.
+### Fluxos Alternativos / Exceções
 
-- **A3 — Usuário deseja excluir a conta:**
-  O sistema exibe aviso sobre a irreversibilidade da ação. Após confirmação, a conta é desativada e os dados são tratados conforme a política de retenção da LGPD.
+| ID | Nome | Descrição |
+|---|---|---|
+| **FA01** | Sem Dados no Período | Sistema exibe mensagem informativa e sugere ajuste de filtro de datas. |
+| **FA02** | Perfil sem Permissão para Exportação | Sistema oculta a opção de exportação de logs de auditoria para perfis abaixo de Gerente (RN11). |
 
-### RF Relacionados
-- RF16 - Perfil e Gerenciamento de Conta
-- RF19 - Consentimento LGPD
+### Relacionamentos
 
-### RNF Relacionados
-- RNF01 - Proteção de Dados Sensíveis (LGPD)
-- RNF03 - Controle de Acesso por Função
+| Tipo | Casos de Uso |
+|---|---|
+| **Include** | UC06 — Persistir Dados de Auditoria (fonte dos dados) |
 
-### RN Relacionadas
-- RN10 - CPF Único por Conta
-- RN11 - Consentimento Explícito para Dados de Saúde
+### Diagrama de Atividades
+
+<img width="529" height="640" alt="image" src="https://github.com/user-attachments/assets/29bb7dfd-1adc-4a89-b55f-6592b40efac1" />
 
 ---
 
-## UC10 — Consultar Histórico de Pedidos
+## UC10 — Autenticar Usuário
 
-### Ator Principal
-Usuário (Cliente)
-
-### Objetivo
-Permitir que o usuário acesse o histórico completo de suas compras, acompanhe o status de pedidos em aberto e inicie uma recompra a partir de um pedido anterior.
-
-### Pré-condições
-- O usuário deve estar autenticado.
-- O usuário deve ter ao menos um pedido registrado.
-
-### Pós-condições
-- O usuário visualiza o histórico com os detalhes e status de cada pedido.
+| Campo | Descrição |
+|---|---|
+| **Ator(es)** | Cliente, Atendente, Farmacêutico, Gerente, Administrador, Dono |
+| **Descrição** | Controla o acesso ao ecossistema por meio de login com CPF/e-mail e senha, emissão de token JWT e logout seguro, com tempo de sessão diferenciado por perfil. |
+| **Pré-condições** | Aplicativo instalado e com conexão ativa; Usuário com cadastro existente no sistema. |
+| **Pós-condições** | Sessão autenticada com token JWT ativo; Usuário redirecionado para a tela inicial de seu perfil. |
+| **RFs relacionados** | RF01 |
+| **RNFs relacionados** | RNF05, RNF07 |
 
 ### Fluxo Principal
-1. O usuário acessa a seção "Conta" e seleciona "Histórico de Pedidos".
-2. O sistema lista todos os pedidos em ordem cronológica decrescente.
-3. Cada pedido exibe: data, itens comprados, valor total e status atual.
-4. O usuário seleciona um pedido para ver os detalhes completos.
-5. O sistema exibe a tela de detalhe com todos os itens, forma de pagamento e endereço de entrega utilizado.
 
-### Fluxos Alternativos
-- **A1 — Repetir pedido anterior:**
-  O usuário toca em "Repetir Pedido" em um registro do histórico. O sistema adiciona os mesmos itens ao carrinho, verificando disponibilidade atual de estoque para cada um, e redireciona para o checkout (UC07).
+1. O Usuário abre o aplicativo e é exibida a tela de splash.
+2. O Sistema verifica se há token JWT válido em cache local.
+3. Se token válido: Sistema redireciona o usuário para a tela inicial do seu perfil (auto-login).
+4. Se não há token ou ele está expirado: Sistema exibe a tela de login.
+5. Usuário informa CPF (ou e-mail) e senha.
+6. Sistema valida as credenciais via API (HTTPS/TLS 1.3 — RNF05).
+7. Sistema emite token JWT com expiração conforme perfil:
+   - **Clientes:** 24 horas (RNF07);
+   - **Colaboradores (Atendente, Farmacêutico, Gerente, Admin, Dono):** 8 horas (RNF07).
+8. Sistema armazena o token de forma segura no dispositivo.
+9. Usuário é redirecionado para a tela inicial do seu perfil.
 
-- **A2 — Item do pedido anterior indisponível na recompra:**
-  O sistema informa quais itens não estão disponíveis e adiciona apenas os disponíveis ao carrinho, exibindo um aviso.
+### Fluxos Alternativos / Exceções
 
-- **A3 — Nenhum pedido encontrado:**
-  O sistema exibe mensagem orientando o usuário a realizar sua primeira compra.
+| ID | Nome | Descrição |
+|---|---|---|
+| **FA01** | Credenciais Inválidas | Sistema exibe mensagem de erro genérica (sem indicar qual campo está errado por segurança) e permite nova tentativa. |
+| **FA02** | Token Expirado durante Sessão | Sistema invalida a sessão local, exibe aviso ao usuário e redireciona para a tela de login. |
+| **FA03** | Múltiplas Tentativas Falhas | Sistema bloqueia temporariamente o acesso após 5 tentativas consecutivas e notifica o Administrador. |
+| **FA04** | Sem Conexão | Sistema informa a indisponibilidade e impede o login até que a conexão seja restabelecida. |
 
-### RF Relacionados
-- RF17 - Histórico de Compras
+### Relacionamentos
 
-### RNF Relacionados
-- RNF07 - Uptime do Sistema
-- RNF03 - Controle de Acesso por Função
+| Tipo | Casos de Uso |
+|---|---|
+| **Include** | Pré-condição obrigatória para todos os demais casos de uso do sistema |
 
-### RN Relacionadas
-- RN12 - Confirmação de Pagamento Antes do Processamento
+### Diagrama de Atividades
+
+<img width="594" height="434" alt="image" src="https://github.com/user-attachments/assets/dd1f694a-602a-467b-913f-e6ad4cfd8922" />
 
 ---
 
-## UC11 — Atendente Receber e Responder Protocolo de Atendimento
+## UC11 — Gerenciar Perfil e Conta
 
-### Ator Principal
-Atendente (Farmacêutico)
-
-### Objetivo
-Permitir que o atendente acesse os protocolos gerados ou encaminhados pelo chatbot Lumi, visualize o contexto completo da conversa e dê continuidade ao atendimento de forma ágil.
-
-### Pré-condições
-- O atendente deve estar autenticado com perfil "Atendente" ou "Administrador".
-- Deve existir ao menos um protocolo aberto ou encaminhado pelo Lumi para atendimento humano.
-
-### Pós-condições
-- Atendimento continuado com contexto preservado.
-- Protocolo atualizado com o registro da intervenção humana.
+| Campo | Descrição |
+|---|---|
+| **Ator(es)** | Cliente, Atendente, Farmacêutico, Gerente, Administrador, Dono |
+| **Descrição** | Permite que cada usuário visualize e atualize seus dados cadastrais, altere sua senha e, no caso do cliente, acesse o histórico completo de compras e receitas enviadas. |
+| **Pré-condições** | Usuário autenticado com sessão ativa (UC10). |
+| **Pós-condições** | Dados atualizados persistidos no banco de dados; Histórico de compras exibido ao cliente. |
+| **RFs relacionados** | RF10 |
+| **RNFs relacionados** | RNF06 |
 
 ### Fluxo Principal
-1. O atendente acessa o painel de protocolos.
-2. O sistema lista os protocolos ativos, ordenados por prioridade e hora de abertura.
-3. O atendente seleciona um protocolo.
-4. O sistema exibe o histórico completo da conversa do usuário com o Lumi, incluindo a dúvida original, as respostas automáticas fornecidas e o motivo do encaminhamento.
-5. O atendente analisa o contexto e inicia a resposta ao usuário.
-6. O atendente encerra o protocolo após resolução, registrando o desfecho.
 
-### Fluxos Alternativos
-- **A1 — Protocolo encaminhado por solicitação de indicação de remédio:**
-  O sistema sinaliza o protocolo com a flag "Indicação Solicitada" para que o farmacêutico saiba o motivo do encaminhamento e possa dar a orientação adequada.
+1. Usuário acessa a tela de "Minha Conta" / "Perfil".
+2. Sistema exibe os dados cadastrais atuais do usuário.
+3. Usuário seleciona o campo a ser alterado (Nome, Telefone, Endereço ou Senha).
+4. Usuário informa o novo valor.
+5. Sistema valida os dados (formato, unicidade de e-mail/CPF).
+6. Sistema persiste a alteração com criptografia nos campos sensíveis (RNF06).
+7. Sistema exibe confirmação de sucesso.
 
-- **A2 — Protocolo transferido por falha de OCR:**
-  O sistema sinaliza o protocolo com a flag "OCR Incompleto" e exibe a imagem da receita original para análise manual do atendente.
+**Fluxo Alternativo — Histórico de Compras (exclusivo para perfil Cliente):**
 
-- **A3 — Protocolo sem resposta do usuário:**
-  Após tempo configurável sem interação do usuário, o protocolo é arquivado automaticamente com status "Encerrado por inatividade".
+1. Cliente acessa a aba "Histórico de Compras".
+2. Sistema lista os pedidos anteriores com data, itens, valor e status.
+3. Cliente seleciona um pedido para ver os detalhes.
+4. Sistema exibe o detalhamento completo, incluindo comprovante e receitas vinculadas.
 
-- **A4 — Atendente redireciona para outro setor:**
-  O atendente pode transferir o protocolo para outro perfil de atendente, mantendo o histórico intacto.
+### Fluxos Alternativos / Exceções
 
-### RF Relacionados
-- RF06 - Chatbot de Atendimento (Lumi)
-- RF08 - Encaminhamento de Casos Complexos
-- RF12 - Protocolo de Atendimento
-- RF09 - OCR de Receitas
+| ID | Nome | Descrição |
+|---|---|---|
+| **FA01** | E-mail já Cadastrado | Sistema identifica duplicidade e solicita outro e-mail. |
+| **FA02** | Senha Atual Incorreta | Ao alterar senha, se a senha atual informada for inválida, o sistema bloqueia a operação. |
+| **FA03** | Sem Histórico | Sistema exibe mensagem informativa caso o cliente não possua compras anteriores. |
 
-### RNF Relacionados
-- RNF03 - Controle de Acesso por Função
-- RNF11 - Escalabilidade do Chatbot
-- RNF07 - Uptime do Sistema
+### Relacionamentos
 
-### RN Relacionadas
-- RN03 - Encaminhamento Obrigatório de Casos Complexos
-- RN04 - Fluxo de Contingência do OCR
-- RN05 - Geração Obrigatória de Protocolo
+| Tipo | Casos de Uso |
+|---|---|
+| **Include** | UC10 — Autenticar Usuário (pré-condição) |
+
+### Diagrama de Atividades
+
+<img width="594" height="514" alt="image" src="https://github.com/user-attachments/assets/9aaea34f-c7ff-4a47-b971-d616032510b4" />
 
 ---
 
-## UC12 — Visualizar Recomendações Sazonais na Home
+## UC12 — Rastrear Pedido em Tempo Real
 
-### Ator Principal
-Usuário (Cliente)
-
-### Objetivo
-Permitir que o usuário descubra produtos relevantes ao contexto atual (sazonalidade e histórico) diretamente na tela inicial, sem necessidade de busca ativa.
-
-### Pré-condições
-- Nenhuma. A Home deve ser acessível sem login.
-- As regras de recomendação sazonal devem estar configuradas pelo administrador.
-
-### Pós-condições
-- O usuário visualiza produtos em destaque relevantes ao momento.
-- O usuário pode adicionar produtos diretamente ao carrinho a partir da Home.
+| Campo | Descrição |
+|---|---|
+| **Ator(es)** | Cliente, Sistema (Automático), Atendente (Entregador) |
+| **Descrição** | Permite ao cliente acompanhar em tempo real o ciclo de vida do seu pedido, desde a confirmação do pagamento até a conclusão da entrega, com notificações automáticas a cada mudança de status. |
+| **Pré-condições** | Pagamento do pedido confirmado (UC08); Cliente autenticado (UC10). |
+| **Pós-condições** | Status do pedido atualizado e visível ao cliente; Histórico de rastreamento registrado. |
+| **RFs relacionados** | RF09, RF23 |
+| **RNs relacionadas** | RN13 |
+| **RNFs relacionados** | RNF04 |
 
 ### Fluxo Principal
-1. O usuário abre o app e é direcionado para a Home.
-2. O sistema carrega o bloco de destaques sazonais com base nas regras configuradas.
-3. O sistema exibe os produtos em destaque com nome, imagem, preço e disponibilidade.
-4. O usuário toca em um produto para ver os detalhes ou o adiciona diretamente ao carrinho.
 
-### Fluxos Alternativos
-- **A1 — Usuário autenticado com histórico:**
-  O sistema personaliza o bloco de destaques cruzando as regras sazonais com os produtos mais comprados pelo usuário.
+1. Após confirmação do pagamento (UC08), o sistema atualiza automaticamente o status para "Pagamento Aprovado".
+2. Sistema dispara notificação Push ao cliente (RF23, RN13).
+3. Atendente separa os produtos e atualiza o status para "Em Separação".
+4. Sistema dispara nova notificação Push ao cliente.
+5. Atendente inicia a entrega e atualiza o status para "Saiu para Entrega".
+6. Sistema dispara nova notificação Push ao cliente.
+7. Atendente confirma a entrega e realiza a baixa final no App.
+8. Sistema atualiza o status para "Entregue" e encerra o ciclo do pedido.
 
-- **A2 — Produto em destaque esgotado:**
-  O sistema substitui automaticamente o produto esgotado pelo próximo da fila de destaques configurada.
+### Fluxos Alternativos / Exceções
 
-- **A3 — Falha no carregamento dos destaques:**
-  O sistema exibe o catálogo padrão sem o bloco sazonal e registra o incidente em log, sem travar a tela.
+| ID | Nome | Descrição |
+|---|---|---|
+| **FA01** | Entrega Não Realizada | Atendente registra tentativa de entrega sem sucesso; sistema notifica o cliente e agenda nova tentativa. |
+| **FA02** | Pedido Cancelado | Se o pagamento expirar ou o pedido for cancelado, sistema atualiza o status e notifica o cliente imediatamente (RN08). |
+| **FA03** | Notificação Push Não Entregue | Sistema registra a falha e tenta reenvio; o status permanece atualizado na tela de rastreamento do app. |
 
-### RF Relacionados
-- RF01 - Catálogo Dinâmico
-- RF05 - Recomendações Sazonais
+### Relacionamentos
 
-### RNF Relacionados
-- RNF05 - Tempo de Carregamento da Home
-- RNF08 - Tratamento de Falhas
+| Tipo | Casos de Uso |
+|---|---|
+| **Extend** | Estende UC08 — Processar Pagamento (ativado após confirmação) |
+| **Include** | UC16 — Receber e Processar Notificação Push |
 
-### RN Relacionadas
-- *(Nenhuma restrição de negócio direta para visualização de vitrine)*
+### Diagrama de Atividades
+
+<img width="508" height="808" alt="image" src="https://github.com/user-attachments/assets/c724e209-9ac7-4871-899b-de86af00c8f4" />
+
 
 ---
 
-## UC13 — Administrador Gerenciar Catálogo de Produtos
+## UC13 — Configurar e Gerenciar IA
 
-### Ator Principal
-Administrador
-
-### Objetivo
-Permitir que o administrador cadastre, edite, ative e desative produtos no catálogo, mantendo o estoque e as informações da vitrine sempre atualizados.
-
-### Pré-condições
-- O usuário deve estar autenticado com perfil "Administrador".
-
-### Pós-condições
-- Catálogo atualizado e refletido em tempo real para todos os clientes.
+| Campo | Descrição |
+|---|---|
+| **Ator(es)** | Administrador |
+| **Descrição** | Permite ao Administrador ajustar os parâmetros de comportamento da IA Americana, incluindo base de conhecimento, gatilhos de transbordo, limites de resposta e configurações de OCR. |
+| **Pré-condições** | Usuário autenticado com perfil Administrador (UC10). |
+| **Pós-condições** | Novos parâmetros persistidos e aplicados ao comportamento da IA em tempo real. |
+| **RFs relacionados** | RF20, RF24 |
+| **RNs relacionadas** | RN01, RN02 |
+| **RNFs relacionados** | RNF02, RNF15, RNF16 |
 
 ### Fluxo Principal
-1. O administrador acessa o painel de gestão de produtos.
-2. O sistema lista todos os produtos cadastrados com nome, categoria, preço e status (ativo/inativo).
-3. O administrador seleciona a ação desejada: cadastrar novo produto, editar produto existente ou alterar status.
-4. Para cadastro: o administrador preenche nome, descrição, imagem, preço, categoria e quantidade em estoque.
-5. O sistema valida os campos obrigatórios e salva o produto.
-6. O produto é publicado imediatamente no catálogo com o status configurado.
 
-### Fluxos Alternativos
-- **A1 — Produto duplicado:**
-  O sistema identifica um produto com nome idêntico já cadastrado e exibe um aviso, solicitando confirmação antes de prosseguir.
+1. Administrador acessa o módulo de "Configurações da IA".
+2. Sistema exibe os parâmetros atuais agrupados por categoria:
+   - Comportamento de atendimento (tempo máximo de resposta, tom);
+   - Gatilhos de transbordo (número de tentativas antes de acionar UC04 — RN01);
+   - Base de conhecimento (produtos, posologias, FAQs);
+   - Configurações de OCR (limiar de confiança — RNF15).
+3. Administrador seleciona o parâmetro a alterar e informa o novo valor.
+4. Sistema valida o valor dentro dos limites permitidos.
+5. Sistema persiste a configuração e aplica ao módulo de IA (RNF16).
+6. Sistema registra o log da alteração para auditoria.
 
-- **A2 — Desativar produto com estoque disponível:**
-  O sistema exibe um aviso informando que o produto possui estoque e solicita confirmação da desativação.
+### Fluxos Alternativos / Exceções
 
-- **A3 — Atualização de estoque:**
-  O administrador pode editar apenas a quantidade em estoque de um produto sem precisar editar os demais campos.
+| ID | Nome | Descrição |
+|---|---|---|
+| **FA01** | Valor Fora do Limite Permitido | Sistema exibe a faixa de valores aceitos e solicita nova entrada (ex: limiar OCR deve ser entre 50% e 99%). |
+| **FA02** | Falha na Aplicação do Parâmetro | Sistema registra o erro, reverte para a configuração anterior e notifica o Administrador. |
 
-- **A4 — Produto da categoria "Controlados":**
-  O sistema aplica automaticamente a flag de trava de receita ao produto, sem necessidade de configuração manual pelo administrador.
+### Relacionamentos
 
-- **A5 — Gerenciar base de dúvidas frequentes do Lumi:**
-  O administrador acessa a seção de conhecimento do chatbot, adiciona novas perguntas e respostas ou edita as existentes. As alterações são aplicadas ao Lumi sem necessidade de nova publicação do app.
+| Tipo | Casos de Uso |
+|---|---|
+| **Extend** | Impacta diretamente o comportamento do UC04 — Realizar Transbordo |
+| **Include** | UC14 — Gerenciar Acessos e Perfis (acesso restrito ao Administrador) |
 
-### RF Relacionados
-- RF01 - Catálogo Dinâmico
-- RF04 - Gestão de Categorias
-- RF11 - Trava de Segurança para Controlados
+### Diagrama de Atividades
 
-### RNF Relacionados
-- RNF03 - Controle de Acesso por Função
-- RNF12 - Base de Dúvidas Frequentes Atualizável
-- RNF13 - Arquitetura Orientada a Serviços
-
-### RN Relacionadas
-- RN06 - Trava de Medicamentos Controlados
+<img width="427" height="587" alt="image" src="https://github.com/user-attachments/assets/154aa6d2-989c-4003-9cb6-1a356d5a1c00" />
 
 ---
 
-> **Convenção de nomenclatura:**
-> - **Fluxo Principal** — caminho feliz, sem erros ou desvios.
-> - **Fluxos Alternativos** — variações válidas ou erros tratáveis pelo sistema.
-> Os UCs cobrem os principais fluxos definidos nos Épicos 01 a 06 do Backlog.
+## UC14 — Gerenciar Acessos e Perfis (RBAC)
+
+| Campo | Descrição |
+|---|---|
+| **Ator(es)** | Administrador |
+| **Descrição** | Permite ao Administrador criar, editar, suspender e revogar perfis de usuários colaboradores, definindo as permissões de acesso a telas e funcionalidades conforme a hierarquia RBAC do sistema. |
+| **Pré-condições** | Usuário autenticado com perfil Administrador (UC10). |
+| **Pós-condições** | Permissões do usuário atualizadas e aplicadas imediatamente na próxima sessão do colaborador. |
+| **RFs relacionados** | RF18 |
+| **RNs relacionadas** | RN11 |
+| **RNFs relacionados** | RNF07 |
+
+### Fluxo Principal
+
+1. Administrador acessa o módulo de "Controle de Acessos".
+2. Sistema lista todos os usuários colaboradores com nome, perfil e status (ativo/suspenso).
+3. Administrador seleciona um usuário ou cria um novo.
+4. Administrador define ou altera o perfil de acesso:
+   - **Atendente:** acesso ao chat, histórico de clientes e catálogo;
+   - **Farmacêutico:** tudo do Atendente + validação de receitas;
+   - **Gerente:** tudo do Farmacêutico + relatórios e configurações da unidade;
+   - **Dono:** tudo do Gerente + dashboards globais de todas as unidades.
+5. Sistema salva a configuração e invalida o token atual do colaborador (se ativo), forçando novo login.
+
+### Fluxos Alternativos / Exceções
+
+| ID | Nome | Descrição |
+|---|---|---|
+| **FA01** | Suspender Usuário | Administrador suspende o acesso de um colaborador; sistema invalida a sessão ativa imediatamente. |
+| **FA02** | Rebaixar Perfil | Sistema invalida a sessão ativa do colaborador após o rebaixamento, forçando novo login com as novas permissões. |
+| **FA03** | Tentativa de Auto-Edição | Sistema impede que o Administrador altere seu próprio perfil para evitar bloqueio acidental. |
+
+### Relacionamentos
+
+| Tipo | Casos de Uso |
+|---|---|
+| **Include** | UC10 — Autenticar Usuário (pré-condição) |
+| **Extend** | Controla o acesso ao UC07, UC09 e UC13 |
+
+### Diagrama de Atividades
+
+<img width="594" height="519" alt="image" src="https://github.com/user-attachments/assets/fe6cb68f-303d-4871-88e2-d4affa700f2c" />
+
+---
+
+## UC15 — Navegar no Catálogo e Consultar Produto
+
+| Campo | Descrição |
+|---|---|
+| **Ator(es)** | Cliente |
+| **Descrição** | Permite ao cliente navegar pelo catálogo de produtos, filtrar por categorias, realizar buscas por texto e consultar detalhes individuais de um produto (foto, descrição, preço e disponibilidade), de forma independente do fluxo de venda. |
+| **Pré-condições** | Usuário autenticado (UC10); Catálogo com produtos cadastrados. |
+| **Pós-condições** | Produto consultado; Cliente pode iniciar uma compra a partir do catálogo ou do chat. |
+| **RFs relacionados** | RF02 |
+| **RNFs relacionados** | RNF01, RNF09 |
+
+### Fluxo Principal
+
+1. Cliente acessa a tela inicial do app, que exibe o catálogo de produtos.
+2. Sistema exibe produtos organizados por categorias com foto, nome e preço.
+3. Cliente navega por categorias ou utiliza a busca por texto (nome ou fabricante).
+4. Sistema retorna os resultados filtrando em tempo real (60 FPS — RNF01).
+5. Cliente seleciona um produto para ver o detalhe.
+6. Sistema exibe a tela do produto com foto ampliada, descrição completa, preço e indicação de disponibilidade em estoque.
+7. Cliente pode iniciar a compra pelo botão "Comprar via Chat" ou retornar ao catálogo.
+
+### Fluxos Alternativos / Exceções
+
+| ID | Nome | Descrição |
+|---|---|---|
+| **FA01** | Nenhum Produto Encontrado | Sistema exibe mensagem informativa e sugere termos similares ou categorias relacionadas. |
+| **FA02** | Produto Sem Estoque | Sistema exibe o produto com indicação visual de "Indisponível" e oculta o botão de compra. |
+
+### Relacionamentos
+
+| Tipo | Casos de Uso |
+|---|---|
+| **Extend** | Pode iniciar o UC01 — Realizar Venda (via botão "Comprar via Chat") |
+
+### Diagrama de Atividades
+
+<img width="594" height="569" alt="image" src="https://github.com/user-attachments/assets/61ce0412-d902-49ff-9860-c65b698e8a8a" />
+
+---
+
+## UC16 — Receber e Processar Notificação Push
+
+| Campo | Descrição |
+|---|---|
+| **Ator(es)** | Cliente, Sistema (Automático) |
+| **Descrição** | Gerencia o recebimento de notificações push pelo dispositivo do cliente e o comportamento do app ao interagir com elas, redirecionando o usuário para a tela correta conforme o tipo de notificação. |
+| **Pré-condições** | Permissão de notificação push concedida pelo cliente no dispositivo; Usuário com sessão ativa ou em background. |
+| **Pós-condições** | Cliente notificado sobre o evento; App redirecionado para a tela correspondente ao toque na notificação. |
+| **RFs relacionados** | RF23 |
+| **RNs relacionadas** | RN13 |
+| **RNFs relacionados** | RNF13 |
+
+### Fluxo Principal
+
+1. O Sistema detecta um evento de mudança de status (pagamento, separação, entrega, receita reprovada).
+2. O Sistema dispara uma notificação push para o dispositivo do cliente via serviço de push (FCM/APNs).
+3. O dispositivo do cliente exibe a notificação na barra de status.
+4. Cliente toca na notificação.
+5. App abre (ou sai do background) e redireciona para a tela correspondente:
+   - **Status de pedido** → Tela de Rastreamento (UC12);
+   - **Mensagem no chat** → Tela de Chat;
+   - **Receita reprovada** → Tela de Chat com a nota do Farmacêutico;
+   - **Erro / Expiração de PIX** → Tela de Pagamento.
+
+### Fluxos Alternativos / Exceções
+
+| ID | Nome | Descrição |
+|---|---|---|
+| **FA01** | Permissão de Push Negada | Sistema registra a preferência e as atualizações ficam visíveis apenas na tela de notificações interna do app. |
+| **FA02** | App Fechado ao Tocar na Notificação | App inicializa normalmente (UC10) e, após autenticação, redireciona para a tela correspondente ao evento. |
+| **FA03** | Notificação Expirada | Se o evento já foi resolvido, o app exibe a tela correspondente com o status atualizado. |
+| **FA04** | Sem Conexão (RNF13) | App enfileira a sincronização de mensagens localmente e exibe o último estado conhecido até restabelecer conexão. |
+
+### Relacionamentos
+
+| Tipo | Casos de Uso |
+|---|---|
+| **Include** | Faz parte do UC12 — Rastrear Pedido em Tempo Real |
+
+### Diagrama de Atividades
+
+<img width="594" height="330" alt="image" src="https://github.com/user-attachments/assets/dc539536-8fbf-4bba-b8b0-fa6ca8fe39be" />
+
+---
+
+> **Diretriz de Implementação:** Todas as regras de negócio devem ser validadas tanto na camada de interface (Flutter) para melhor UX quanto na camada de serviços (Backend) para garantir a integridade dos dados. Referência: RNs e RNFs deste documento.
