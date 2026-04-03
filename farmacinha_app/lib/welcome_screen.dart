@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:farmacia_app/pallete.dart';
+import 'package:farmacia_app/app_routes.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -50,7 +51,7 @@ class WelcomeScreen extends StatelessWidget {
                         width: double.infinity,
                         height: 52,
                         child: ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () => Navigator.of(context).pushNamed(AppRoutes.login),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Pallete.actionButton,
                             elevation: 0,
@@ -75,7 +76,7 @@ class WelcomeScreen extends StatelessWidget {
                         width: double.infinity,
                         height: 52,
                         child: OutlinedButton(
-                          onPressed: () {},
+                          onPressed: () => Navigator.of(context).pushNamed(AppRoutes.register),
                           style: OutlinedButton.styleFrom(
                             side: const BorderSide(
                               color: Pallete.actionButton,
