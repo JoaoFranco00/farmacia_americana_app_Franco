@@ -100,7 +100,7 @@ class WelcomeScreen extends StatelessWidget {
                 ),
 
                 GestureDetector(
-                  onTap: viewModel.enterAsGuest,
+                  onTap: () => viewModel.enterAsGuest(context),
                   child: const Text(
                     'Entrar como visitante',
                     style: TextStyle(
