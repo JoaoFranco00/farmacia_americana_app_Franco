@@ -24,15 +24,15 @@ class LoginViewModel extends ChangeNotifier {
   }
 
   Future<void> login(BuildContext context) async {
-    final email = emailController.text;
-    final password = passwordController.text;
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
 
     debugPrint("Tentativa de login - Usuário: $email");
 
     try {
       // Busca o usuário no Mock seguindo as credenciais
       final user = MockUsers.getUsers().firstWhere(
-        (u) => u.email == email && u.password == password,
+        (u) => u.email.toLowerCase() == email.toLowerCase() && u.password == password,
       );
 
       // Redirecionamento baseado no Role
