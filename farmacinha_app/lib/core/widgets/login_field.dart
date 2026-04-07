@@ -3,13 +3,20 @@ import '../palette/pallete.dart';
 
 class LoginField extends StatelessWidget {
   final String hintText;
-  const LoginField({super.key, required this.hintText, required TextEditingController controller});
+  final TextEditingController controller; // VARIÁVEL 
+
+  const LoginField({
+    super.key, 
+    required this.hintText, 
+    required this.controller, // 'this.controller' PARA GUARDAR O VALOR
+  });
 
   @override
   Widget build(BuildContext context) {
     return ConstrainedBox(
       constraints: const BoxConstraints(maxWidth: 330),
       child: TextFormField(
+        controller: controller, // VINCULAR O CONTROLLER AO TEXTFORMFIELD
         decoration: InputDecoration(
           contentPadding: const EdgeInsets.all(20),
           enabledBorder: OutlineInputBorder(

@@ -14,12 +14,12 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  // Instanciando a ViewModel
+  // Instanciando a ViewModel que gerencia os controllers e a lógica de login
   final LoginViewModel viewModel = LoginViewModel();
 
   @override
   void dispose() {
-    // É essencial descartar a ViewModel para fechar os TextEditingControllers
+    // IMPORTANTE: Liberar a memória dos controllers ao fechar a tela
     viewModel.dispose();
     super.dispose();
   }
@@ -45,19 +45,21 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 50),
 
-                  // CORREÇÃO: Removido 'const' e adicionado o controller
+                  // Campo de Email vinculado ao controller da ViewModel
                   LoginField(
                     hintText: 'Email',
                     controller: viewModel.emailController,
                   ),
                   const SizedBox(height: 16),
 
+                  // Campo de Senha com controle de visibilidade
                   PasswordField(
                     controller: viewModel.passwordController,
                     obscureText: viewModel.obscurePassword,
                     onToggleVisibility: viewModel.togglePasswordVisibility,
                   ),
 
+                  // Seção "Salvar Login"
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 35),
                     child: Row(
@@ -68,12 +70,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           child: Checkbox(
                             side: const BorderSide(color: Pallete.borderColor),
                             value: viewModel.isRememberMe,
-                            activeColor: const Color.fromARGB(
-                              255,
-                              233,
-                              206,
-                              120,
-                            ),
+                            activeColor: const Color.fromARGB(255, 233, 206, 120),
                             onChanged: viewModel.toggleRememberMe,
                           ),
                         ),
@@ -91,9 +88,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   const SizedBox(height: 30),
                   
-                  // Chamando a função de login da ViewModel
+                  // Botão de Login chamando o método com o context
                   GradientButton(
-                    onPressed: () => viewModel.login(),
+                    onPressed: () => viewModel.login(context),
                   ),
 
                   const SizedBox(height: 52),
@@ -106,15 +103,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 20),
 
+                  // Botões Sociais (Apenas UI por enquanto)
                   SocialButton(
                     iconName: 'g_logo',
                     label: 'Entrar com Google',
                     iconColor: Pallete.googleLogo,
                     textColor: Pallete.textColor,
                     horizontalPadding: 80.0,
-                    onPressed: () {
-                      debugPrint("Login Social Google");
-                    },
+                    onPressed: () => debugPrint("Login Social Google"),
                   ),
                   const SizedBox(height: 25),
                   SocialButton(
@@ -122,9 +118,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     iconColor: Pallete.facebookLogo,
                     label: 'Entrar com Facebook',
                     textColor: Pallete.textColor,
-                    onPressed: () {
-                      debugPrint("Login Social Facebook");
-                    },
+                    onPressed: () => debugPrint("Login Social Facebook"),
                   ),
                   const SizedBox(height: 25),
                 ],

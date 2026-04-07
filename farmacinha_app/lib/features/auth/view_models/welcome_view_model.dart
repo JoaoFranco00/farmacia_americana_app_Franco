@@ -10,8 +10,8 @@ class WelcomeViewModel extends ChangeNotifier {
     Navigator.of(context).pushNamed(AppRoutes.register);
   }
 
-  void enterAsGuest() {
-    // Lógica futura para persistir estado de visitante
+  void enterAsGuest(BuildContext context) {
     debugPrint("Entrando como visitante...");
-  }
+    Navigator.pushNamed(context, AppRoutes.homeClient);
+}
 }
