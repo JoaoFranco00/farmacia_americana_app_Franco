@@ -12,6 +12,6 @@ class WelcomeViewModel extends ChangeNotifier {
 
   void enterAsGuest(BuildContext context) {
     debugPrint("Entrando como visitante...");
-    Navigator.pushNamed(context, AppRoutes.catalog);
+    Navigator.pushNamed(context, AppRoutes.homeClient);
 }
 }
