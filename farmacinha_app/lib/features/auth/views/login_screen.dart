@@ -93,7 +93,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   
                   // Chamando a função de login da ViewModel
                   GradientButton(
-                    onPressed: () => viewModel.login(),
+                    onPressed: () => viewModel.login(context),
                   ),
 
                   const SizedBox(height: 52),
