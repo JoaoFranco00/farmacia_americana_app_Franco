@@ -3,7 +3,7 @@ import 'package:farmacia_app/core/palette/pallete.dart';
 import 'package:farmacia_app/features/client/home_client/view_model/home_client_view_model.dart';
 import 'package:farmacia_app/features/client/home_client/view/widgets/product_card.dart';
 import 'package:farmacia_app/features/client/home_client/view/widgets/custom_app_bar.dart';
-import 'package:farmacia_app/features/client/home_client/view/widgets/custom_bottom_nav_bar.dart';
+import 'package:farmacia_app/features/client/widgets/custom_bottom_nav_bar.dart';
 import 'package:farmacia_app/features/client/home_client/view/widgets/banner_carousel.dart';
 import 'package:farmacia_app/features/client/home_client/view/widgets/category_grid.dart';
 
