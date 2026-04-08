@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:farmacia_app/core/palette/pallete.dart';
 import 'package:farmacia_app/features/client/home_client/view_model/home_client_view_model.dart';
 import 'package:farmacia_app/features/client/home_client/view/widgets/product_card.dart';
-import 'package:farmacia_app/features/client/home_client/view/widgets/custom_app_bar.dart';
+import 'package:farmacia_app/features/client/widgets/custom_app_bar.dart';
 import 'package:farmacia_app/features/client/widgets/custom_bottom_nav_bar.dart';
 import 'package:farmacia_app/features/client/home_client/view/widgets/banner_carousel.dart';
 import 'package:farmacia_app/features/client/home_client/view/widgets/category_grid.dart';
@@ -28,11 +28,7 @@ class _HomeClientScreenState extends State<HomeClientScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Pallete.backgroundColor,
-      appBar: CustomAppBar(
-        onMenuTap: () => debugPrint('Abrir Drawer'),
-        onNotificationTap: () => debugPrint('Abrir Notificações'),
-        onLogoTap: () => debugPrint('Logo clicada'),
-      ),
+      appBar: const CustomAppBar(),
       body: ListenableBuilder(
         listenable: viewModel,
         builder: (context, _) {
