@@ -7,9 +7,9 @@ class MockProducts {
       Product(
         id: '1',
         name: 'Dipirona 500mg',
+        description: 'Analgésico e antitérmico ideal para o alívio rápido de dores e febre. Uso adulto e pediátrico acima de 15 anos.',
         price: 15.90,
-        imageUrl:
-            'https://images.tcdn.com.br/img/img_prod/829162/produto_teste_nao_compre_81_1_2d7f0b8fa031db8286665740dd8de217.jpg',
+        imageUrl: 'https://www.drogaraia.com.br/_next/image?url=https%3A%2F%2Fproduct-data.raiadrogasil.io%2Fimages%2F3559267.webp&w=3840&q=40',
         rating: 4.8,
         reviewCount: 324,
         category: 'medicamentos',
@@ -19,9 +19,9 @@ class MockProducts {
       Product(
         id: '2',
         name: 'Vitamina C 1000mg',
+        description: 'Suplemento vitamínico em comprimidos efervescentes que auxilia no fortalecimento do sistema imunológico e possui ação antioxidante.',
         price: 45.00,
-        imageUrl:
-            'https://images.tcdn.com.br/img/img_prod/829162/produto_teste_nao_compre_81_1_2d7f0b8fa031db8286665740dd8de217.jpg',
+        imageUrl: 'https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcQDIUT6-SnfMIlbcp_ffAjzffRZqIsbh-X2wps5KYcDlaAAFwV6aNDDXr4HawpHc8-o0VXKTcsxFczwSxoGJ-7N2-oy4xumRt0pPGrLRWLWbhFBMWmUYkKZt-vqCygP3DeSLXTGfAM&usqp=CAc',
         rating: 4.6,
         reviewCount: 256,
         category: 'vitaminas',
@@ -31,19 +31,19 @@ class MockProducts {
       Product(
         id: '3',
         name: 'Omeprazol 20mg',
+        description: 'Indicado para o tratamento de certas condições em que ocorra excessiva produção de ácido no estômago, como úlceras e refluxo.',
         price: 28.50,
-        imageUrl:
-            'https://images.tcdn.com.br/img/img_prod/829162/produto_teste_nao_compre_81_1_2d7f0b8fa031db8286665740dd8de217.jpg',
+        imageUrl: 'https://d1jgmae0hcnr1i.cloudfront.net/Custom/Content/Products/16/85/168535_omeprazol-20-mg-c-28-cp-p70046_m1_638325338372850156.webp',
         rating: 4.9,
         reviewCount: 512,
         category: 'medicamentos',
       ),
       Product(
         id: '4',
-        name: 'Antitérmico Infantil',
+        name: 'Tylemax Baby 100mg',
+        description: 'Suspensão oral com sabor agradável, formulada especialmente para reduzir a febre e aliviar dores leves em crianças.',
         price: 22.00,
-        imageUrl:
-            'https://images.tcdn.com.br/img/img_prod/829162/produto_teste_nao_compre_81_1_2d7f0b8fa031db8286665740dd8de217.jpg',
+        imageUrl: 'https://uploads.consultaremedios.com.br/product_variation_images/full/5335333db27e3154aa81f7330ab473565b1cbcf4.jpg?1658957229',
         rating: 4.7,
         reviewCount: 189,
         category: 'medicamentos',
@@ -53,9 +53,9 @@ class MockProducts {
       Product(
         id: '5',
         name: 'Sabonete Líquido 250ml',
+        description: 'Limpeza suave e hidratação para todos os tipos de pele. Possui pH balanceado e fragrância de lavanda.',
         price: 8.90,
-        imageUrl:
-            'https://images.tcdn.com.br/img/img_prod/829162/produto_teste_nao_compre_81_1_2d7f0b8fa031db8286665740dd8de217.jpg',
+        imageUrl: 'https://promofarma.vtexassets.com/arquivos/ids/166283/7891150060159.jpg?v=637952085989070000',
         rating: 4.5,
         reviewCount: 478,
         category: 'higiene',
@@ -65,9 +65,9 @@ class MockProducts {
       Product(
         id: '6',
         name: 'Álcool Gel 500ml',
+        description: 'Higienizador de mãos 70% com hidratante. Elimina 99,9% dos germes e bactérias sem ressecar a pele.',
         price: 12.50,
-        imageUrl:
-            'https://images.tcdn.com.br/img/img_prod/829162/produto_teste_nao_compre_81_1_2d7f0b8fa031db8286665740dd8de217.jpg',
+        imageUrl: 'https://img.kalunga.com.br/fotosdeprodutos/324307z.jpg',
         rating: 4.4,
         reviewCount: 645,
         category: 'higiene',
@@ -75,9 +75,9 @@ class MockProducts {
       Product(
         id: '7',
         name: 'Colgate Total 90g',
+        description: 'Creme dental que oferece proteção total por até 12 horas, prevenindo cáries, placa e problemas na gengiva.',
         price: 7.50,
-        imageUrl:
-            'https://images.tcdn.com.br/img/img_prod/829162/produto_teste_nao_compre_81_1_2d7f0b8fa031db8286665740dd8de217.jpg',
+        imageUrl: 'https://bretas.vtexassets.com/arquivos/ids/219911/676582a324ed1252c355a44a.jpg?v=638703026351670000',
         rating: 4.8,
         reviewCount: 832,
         category: 'higiene',
@@ -89,9 +89,9 @@ class MockProducts {
       Product(
         id: '8',
         name: 'Hidratante Facial 50ml',
+        description: 'Creme hidratante com textura leve e rápida absorção. Enriquecido com ácido hialurônico para hidratação profunda.',
         price: 59.90,
-        imageUrl:
-            'https://images.tcdn.com.br/img/img_prod/829162/produto_teste_nao_compre_81_1_2d7f0b8fa031db8286665740dd8de217.jpg',
+        imageUrl: 'https://mantecorp.vtexassets.com/arquivos/ids/165251/7891142206596_0-20230529-193612.png?v=638210536947730000',
         rating: 4.7,
         reviewCount: 392,
         category: 'beleza',
@@ -101,9 +101,9 @@ class MockProducts {
       Product(
         id: '9',
         name: 'Sérum Vitamina C',
+        description: 'Sérum concentrado antioxidante que uniformiza o tom da pele e devolve a luminosidade natural do rosto.',
         price: 89.90,
-        imageUrl:
-            'https://images.tcdn.com.br/img/img_prod/829162/produto_teste_nao_compre_81_1_2d7f0b8fa031db8286665740dd8de217.jpg',
+        imageUrl: 'https://drogariasp.vteximg.com.br/arquivos/ids/795259-1000-1000/793639---Serum-Payot-Vitamina-C-15-30ml-1.jpg?v=638017263818400000',
         rating: 4.9,
         reviewCount: 267,
         category: 'beleza',
@@ -111,9 +111,9 @@ class MockProducts {
       Product(
         id: '10',
         name: 'Protetor Solar FPS 50',
+        description: 'Proteção UVA/UVB de amplo espectro com controle de oleosidade e acabamento invisível.',
         price: 45.00,
-        imageUrl:
-            'https://images.tcdn.com.br/img/img_prod/829162/produto_teste_nao_compre_81_1_2d7f0b8fa031db8286665740dd8de217.jpg',
+        imageUrl: 'https://www.drogasil.com.br/_next/image?url=https%3A%2F%2Fproduct-data.raiadrogasil.io%2Fimages%2F14602209.webp&w=3840&q=40',
         rating: 4.6,
         reviewCount: 521,
         category: 'beleza',
@@ -125,9 +125,9 @@ class MockProducts {
       Product(
         id: '11',
         name: 'Colágeno Hidrolisado',
+        description: 'Pó para preparo de bebida à base de colágeno, auxiliando na manutenção da saúde da pele, cabelos e unhas.',
         price: 78.90,
-        imageUrl:
-            'https://images.tcdn.com.br/img/img_prod/829162/produto_teste_nao_compre_81_1_2d7f0b8fa031db8286665740dd8de217.jpg',
+        imageUrl: 'https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcRvflBcjSbiAdaxavBXLEnOZVwK6bL_-qIF0Lah7Slh3PR5TlxDQuCwlcn243LjKpJ46BkhGjTkJRoWSpMm9je_cqB10EuSIOAthMAQ3f6o_UtZc1_0OPJVfqLLALSvttMaMz3nlG6bAg&usqp=CAc',
         rating: 4.8,
         reviewCount: 433,
         category: 'suplementos',
@@ -135,9 +135,9 @@ class MockProducts {
       Product(
         id: '12',
         name: 'Ômega 3 60 cápsulas',
+        description: 'Cápsulas de óleo de peixe ricas em EPA e DHA, que contribuem para a saúde cardiovascular e cerebral.',
         price: 55.00,
-        imageUrl:
-            'https://images.tcdn.com.br/img/img_prod/829162/produto_teste_nao_compre_81_1_2d7f0b8fa031db8286665740dd8de217.jpg',
+        imageUrl: 'https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcRhADW0i2yxE-CqiQWNJAksLRpjiqW1vC_NXjOUSPs326Fx2HuAN2ytMjn86tOuezdDilEo7Q3LLV828S5bfzK-vfHXyv-AN9D8h-CRy_8NA3hVyj_5h8K7rsVOYnkr_nBwqxmPB18&usqp=CAc',
         rating: 4.7,
         reviewCount: 356,
         category: 'suplementos',

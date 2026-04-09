@@ -6,6 +6,8 @@ import 'package:farmacia_app/features/client/widgets/custom_app_bar.dart';
 import 'package:farmacia_app/features/client/widgets/custom_bottom_nav_bar.dart';
 import 'package:farmacia_app/features/client/home_client/view/widgets/banner_carousel.dart';
 import 'package:farmacia_app/features/client/home_client/view/widgets/category_grid.dart';
+// IMPORT DA NOVA VIEW DE DETALHES
+import 'package:farmacia_app/features/client/product_detail/view/product_detail_view.dart';
 
 class HomeClientScreen extends StatefulWidget {
   const HomeClientScreen({super.key});
@@ -45,50 +47,50 @@ class _HomeClientScreenState extends State<HomeClientScreen> {
             return _buildErrorState();
           }
 
-          return SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildSearchBar(),
-                BannerCarousel(
-                  banners: viewModel
-                      .banners, 
-                  onTap: (id) {
-                    debugPrint('Banner $id clicado');
-                  },
-                ),
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: Text(
-                    'Categorias',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Color.fromARGB(255, 50, 50, 50),
+          return RefreshIndicator(
+            onRefresh: () async => viewModel.clearFilters(),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildSearchBar(),
+                  BannerCarousel(
+                    banners: viewModel.banners,
+                    onTap: (id) => debugPrint('Banner $id clicado'),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    child: Text(
+                      'Categorias',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Color.fromARGB(255, 50, 50, 50),
+                      ),
                     ),
                   ),
-                ),
-                CategoryGrid(
-                  categories: viewModel.categories,
-                  onCategoryTap: (id) => viewModel.selectCategory(id),
-                ),
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                  child: Text(
-                    'Destaques para você',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Color.fromARGB(255, 50, 50, 50),
+                  CategoryGrid(
+                    categories: viewModel.categories,
+                    onCategoryTap: (id) => viewModel.selectCategory(id),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    child: Text(
+                      'Destaques para você',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Color.fromARGB(255, 50, 50, 50),
+                      ),
                     ),
                   ),
-                ),
-                if (viewModel.filteredProducts.isNotEmpty)
-                  _buildProductsGrid()
-                else
-                  _buildEmptyState(),
-                const SizedBox(height: 30),
-              ],
+                  if (viewModel.filteredProducts.isNotEmpty)
+                    _buildProductsGrid()
+                  else
+                    _buildEmptyState(),
+                  const SizedBox(height: 30),
+                ],
+              ),
             ),
           );
         },
@@ -147,7 +149,16 @@ class _HomeClientScreenState extends State<HomeClientScreen> {
             reviewCount: product.reviewCount,
             isOnPromotion: product.isOnPromotion,
             discountPercentage: product.discountPercentage,
-            onTap: () => viewModel.viewProductDetail(product),
+            onTap: () {
+              // EXECUÇÃO DA NAVEGAÇÃO
+              viewModel.viewProductDetail(product);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ProductDetailView(product: product),
+                ),
+              );
+            },
             onAddToCart: () => viewModel.addToCart(product),
           );
         },
@@ -190,7 +201,7 @@ class _HomeClientScreenState extends State<HomeClientScreen> {
           Text(viewModel.errorMessage ?? 'Ocorreu um erro inesperado'),
           const SizedBox(height: 16),
           ElevatedButton(
-            onPressed: () => setState(() {}),
+            onPressed: () => viewModel.clearFilters(),
             child: const Text('Tentar novamente'),
           ),
         ],

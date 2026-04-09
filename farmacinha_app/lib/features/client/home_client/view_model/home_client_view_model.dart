@@ -23,7 +23,7 @@ class HomeClientViewModel extends ChangeNotifier {
   // ===== GETTERS =====
   List<Product> get filteredProducts => _filteredProducts;
   List<Category> get categories => _categories;
-  List<BannerModel> get banners => _banners; // Getter adicionado
+  List<BannerModel> get banners => _banners;
   String get selectedCategoryId => _selectedCategoryId;
   String get searchQuery => _searchQuery;
   bool get isLoading => _isLoading;
@@ -41,11 +41,12 @@ class HomeClientViewModel extends ChangeNotifier {
     _setLoading(true);
     _errorMessage = null;
 
+    // Simula o tempo de resposta de uma API
     Future.delayed(const Duration(milliseconds: 800), () {
       try {
         _allProducts = MockProducts.getProducts();
         _categories = MockCategories.getCategories();
-        _banners = MockBanners.getBanners(); // Inicialização adicionada
+        _banners = MockBanners.getBanners();
         _filteredProducts = _allProducts;
         _setLoading(false);
       } catch (e) {
@@ -54,7 +55,7 @@ class HomeClientViewModel extends ChangeNotifier {
       }
     });
   }
-
+  
   void _onSearchChanged() {
     _searchQuery = searchController.text;
     _applyFilters();
@@ -65,7 +66,7 @@ class HomeClientViewModel extends ChangeNotifier {
       final categoryMatch =
           _selectedCategoryId.isEmpty ||
           _selectedCategoryId == 'all' ||
-          product.category == _selectedCategoryId;
+          product.category.toLowerCase() == _selectedCategoryId.toLowerCase();
 
       final searchMatch =
           _searchQuery.isEmpty ||
@@ -97,11 +98,13 @@ class HomeClientViewModel extends ChangeNotifier {
   }
 
   void addToCart(Product product) {
+    // Aqui você conectará futuramente com a sua CartViewModel ou Service
     debugPrint('Adicionado ao carrinho: ${product.name}');
   }
 
+  // Este método pode ser usado para Analytics ou logs antes da navegação
   void viewProductDetail(Product product) {
-    debugPrint('Ver detalhes: ${product.name}');
+    debugPrint('Usuário visualizando detalhes de: ${product.name}');
   }
 
   List<Product> getPromotionalProducts() {
@@ -110,6 +113,7 @@ class HomeClientViewModel extends ChangeNotifier {
 
   @override
   void dispose() {
+    searchController.removeListener(_onSearchChanged);
     searchController.dispose();
     super.dispose();
   }

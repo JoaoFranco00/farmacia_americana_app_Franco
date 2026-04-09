@@ -1,0 +1,136 @@
+import 'package:flutter/material.dart';
+import 'package:farmacia_app/features/client/home_client/data/models/product_model.dart';
+import 'package:farmacia_app/core/palette/pallete.dart';
+import '../view_model/product_detail_view_model.dart';
+
+class ProductDetailView extends StatelessWidget {
+  final Product product;
+
+  const ProductDetailView({super.key, required this.product});
+
+  @override
+  Widget build(BuildContext context) {
+    // CORREÇÃO: Passando o product obrigatório para a ViewModel
+    final viewModel = ProductDetailViewModel(product: product);
+
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: Text(product.name),
+        elevation: 0,
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Imagem do Produto
+            Center(
+              child: Image.network(
+                product.imageUrl,
+                height: 300,
+                fit: BoxFit.contain,
+              ),
+            ),
+            
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (product.isOnPromotion)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      margin: const EdgeInsets.only(bottom: 8),
+                      decoration: BoxDecoration(
+                        color: Pallete.primaryRed.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        '${product.discountPercentage}% OFF',
+                        style: const TextStyle(color: Pallete.primaryRed, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  
+                  Text(
+                    product.name,
+                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+                  
+                  Row(
+                    children: [
+                      const Icon(Icons.star, color: Colors.amber, size: 20),
+                      Text(
+                        " ${product.rating} (${product.reviewCount} avaliações)",
+                        style: const TextStyle(color: Colors.grey),
+                      ),
+                    ],
+                  ),
+                  
+                  const SizedBox(height: 15),
+                  
+                  Text(
+                    "R\$ ${product.price.toStringAsFixed(2)}",
+                    style: const TextStyle(
+                      fontSize: 28, 
+                      color: Colors.green, 
+                      fontWeight: FontWeight.bold
+                    ),
+                  ),
+
+                  const SizedBox(height: 25),
+
+                  // BOTÕES (Movidos para cima, dentro do scroll)
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFFDE8E8), // Tom rosado da sua imagem
+                      foregroundColor: Colors.brown,
+                      minimumSize: const Size(double.infinity, 55),
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                    ),
+                    onPressed: () => viewModel.addToCart(),
+                    child: const Text("Adicionar ao Carrinho", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  ),
+                  
+                  const SizedBox(height: 12),
+                  
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Pallete.primaryRed,
+                      foregroundColor: Colors.white,
+                      minimumSize: const Size(double.infinity, 55),
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                    ),
+                    onPressed: () {
+                      // Lógica de compra
+                    },
+                    child: const Text("Comprar Agora", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  ),
+
+                  const SizedBox(height: 30),
+
+                  // DESCRIÇÃO DO PRODUTO
+                  const Text(
+                    "Descrição",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  const Divider(),
+                  const SizedBox(height: 10),
+                  Text(
+                    product.description,
+                    style: const TextStyle(fontSize: 16, color: Colors.black87, height: 1.5),
+                  ),
+                  
+                  const SizedBox(height: 40), // Espaço final
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

@@ -11,6 +11,8 @@ class ProductDetailViewModel extends ChangeNotifier {
 
   // Lógica para adicionar ao carrinho com feedback visual
   Future<void> addToCart() async {
+    if (_isAdding) return; // Evita cliques duplos enquanto processa
+
     _isAdding = true;
     notifyListeners();
 

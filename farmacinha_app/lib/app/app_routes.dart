@@ -20,7 +20,6 @@ class AppRoutes {
         welcome: (_) => WelcomeScreen(),
         login: (_) => LoginScreen(),
         register: (_) => RegisterScreen(),
-        // Apontando para a HomeClientScreen que acabamos de debugar
         homeClient: (_) => HomeClientScreen(),
         homeAttendant: (_) => HomeAttendantScreen()
       };
