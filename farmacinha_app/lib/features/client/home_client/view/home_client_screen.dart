@@ -32,32 +32,24 @@ class _HomeClientScreenState extends State<HomeClientScreen> {
 
   // Navega para a tela correspondente ao tab selecionado
   void _onTabTapped(int index) {
+    setState(() => _currentTabIndex = index);
+
     switch (index) {
       case 0:
-        // Home — permanece na mesma tela
-        setState(() => _currentTabIndex = 0);
         break;
+
       case 1:
-        // Buscar — placeholder
-        setState(() => _currentTabIndex = 1);
-        debugPrint('Abrir Buscar');
-        break;
-      case 2:
-        // Chat — placeholder
-        setState(() => _currentTabIndex = 2);
         debugPrint('Abrir Chat');
         break;
-      case 3:
-        // Carrinho — placeholder
-        setState(() => _currentTabIndex = 3);
+
+      case 2:
         debugPrint('Abrir Carrinho');
         break;
-      case 4:
-        // Conta — sua tela
-        setState(() => _currentTabIndex = 4);
-        Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => const AccountScreen()),
-        );
+
+      case 3:
+        Navigator.of(
+          context,
+        ).push(MaterialPageRoute(builder: (_) => const AccountScreen()));
         break;
     }
   }

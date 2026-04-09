@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:farmacia_app/core/palette/pallete.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
+  final VoidCallback onMenuTap;
+  final VoidCallback onNotificationTap;
   final VoidCallback? onLogoTap;
-  final VoidCallback? onMenuTap;
-  final VoidCallback? onNotificationTap;
 
   const CustomAppBar({
     super.key,
+    required this.onMenuTap,
+    required this.onNotificationTap,
     this.onLogoTap,
-    this.onMenuTap,
-    this.onNotificationTap,
   });
 
   @override
@@ -18,12 +18,11 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       elevation: 1,
       backgroundColor: Pallete.whiteColor,
-      automaticallyImplyLeading: false,
-      centerTitle: true,
       leading: IconButton(
         icon: const Icon(
-          Icons.menu,
+          Icons.menu_rounded,
           color: Pallete.primaryRed,
+          size: 28,
         ),
         onPressed: onMenuTap,
       ),
@@ -54,13 +53,47 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           ),
         ),
       ),
+      centerTitle: true,
       actions: [
-        IconButton(
-          icon: const Icon(
-            Icons.notifications_none,
-            color: Pallete.primaryRed,
+        Padding(
+          padding: const EdgeInsets.only(right: 16),
+          child: Center(
+            child: Stack(
+              children: [
+                IconButton(
+                  icon: const Icon(
+                    Icons.notifications_none_rounded,
+                    color: Pallete.primaryRed,
+                    size: 26,
+                  ),
+                  onPressed: onNotificationTap,
+                ),
+                // Badge de notificação
+                Positioned(
+                  right: 8,
+                  top: 8,
+                  child: Container(
+                    width: 18,
+                    height: 18,
+                    decoration: const BoxDecoration(
+                      color: Pallete.primaryRed,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Center(
+                      child: Text(
+                        '3',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
-          onPressed: onNotificationTap,
         ),
       ],
     );
