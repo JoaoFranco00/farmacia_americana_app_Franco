@@ -26,8 +26,8 @@ class MockUsers {
       ),
       User(
         id: '4',
-        name: 'Dono da Farmácia',
-        email: 'teste.dono@americana.com',
+        name: 'Gerente',
+        email: 'teste.gerente@americana.com',
         password: '123',
         role: UserRole.dono,
       ),

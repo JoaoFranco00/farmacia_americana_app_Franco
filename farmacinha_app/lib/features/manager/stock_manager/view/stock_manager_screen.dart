@@ -1,0 +1,241 @@
+import 'package:flutter/material.dart';
+import 'package:farmacia_app/core/palette/pallete.dart';
+import 'package:farmacia_app/features/manager/stock_manager/view/widgets/stock_product_card.dart';
+import 'package:farmacia_app/features/manager/stock_manager/view/widgets/category_filter_chips.dart';
+import 'package:farmacia_app/features/manager/stock_manager/view_model/stock_manager_view_model.dart';
+
+class StockManagerScreen extends StatefulWidget {
+  const StockManagerScreen({super.key});
+
+  @override
+  State<StockManagerScreen> createState() => _StockManagerScreenState();
+}
+
+class _StockManagerScreenState extends State<StockManagerScreen> {
+  final _viewModel = StockManagerViewModel();
+  final _searchController = TextEditingController();
+
+  String _selectedCategory = 'Todos';
+  String _searchQuery = '';
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Produtos já filtrados por categoria e busca
+    final products = _viewModel.getFilteredProducts(
+      selectedCategory: _selectedCategory,
+      searchQuery: _searchQuery,
+    );
+
+    return Scaffold(
+      backgroundColor: const Color(0xFFF8FAFC),
+      appBar: _buildAppBar(),
+      body: _buildBody(products),
+    );
+  }
+
+
+  PreferredSizeWidget _buildAppBar() {
+    return AppBar(
+      backgroundColor: Pallete.whiteColor,
+      elevation: 0,
+      surfaceTintColor: Colors.transparent,
+      bottom: PreferredSize(
+        preferredSize: const Size.fromHeight(1),
+        child: Container(height: 1, color: Pallete.borderColor),
+      ),
+      title: Row(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: Pallete.primaryRed.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: const Icon(
+              Icons.inventory_2_rounded,
+              color: Pallete.primaryRed,
+              size: 22,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'FARMÁCIA AMERICANA',
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
+                  color: Pallete.primaryRed,
+                  letterSpacing: -0.3,
+                ),
+              ),
+              Text(
+                'Painel Administrativo',
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w500,
+                  color: Pallete.textColor,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.notifications_outlined, color: Pallete.textColor),
+          onPressed: () {},
+        ),
+        IconButton(
+          icon: const Icon(Icons.settings_outlined, color: Pallete.textColor),
+          onPressed: () {},
+        ),
+        const SizedBox(width: 4),
+      ],
+    );
+  }
+
+  Widget _buildBody(List<Map<String, dynamic>> products) {
+    return CustomScrollView(
+      slivers: [
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Título e contagem
+                const Text(
+                  'Estoque',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w800,
+                    color: Color(0xFF0F172A),
+                    letterSpacing: -0.5,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '${_viewModel.totalProducts} produtos cadastrados',
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Pallete.textColor,
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                // Campo de busca
+                TextField(
+                  controller: _searchController,
+                  onChanged: (value) => setState(() => _searchQuery = value),
+                  decoration: InputDecoration(
+                    hintText: 'Buscar produto...',
+                    hintStyle: TextStyle(
+                      fontSize: 13,
+                      color: Pallete.textColor.withOpacity(0.6),
+                    ),
+                    prefixIcon: const Icon(
+                      Icons.search_rounded,
+                      color: Pallete.textColor,
+                      size: 20,
+                    ),
+                    filled: true,
+                    fillColor: Pallete.whiteColor,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: Pallete.borderColor),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: Pallete.borderColor),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(
+                        color: Pallete.primaryRed,
+                        width: 1.5,
+                      ),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                // Filtros de categoria
+                CategoryFilterChips(
+                  categories: _viewModel.categories,
+                  selectedCategory: _selectedCategory,
+                  onSelected: (category) {
+                    setState(() => _selectedCategory = category);
+                  },
+                ),
+
+                const SizedBox(height: 20),
+              ],
+            ),
+          ),
+        ),
+
+        // Grade de produtos
+        products.isEmpty
+            ? SliverFillRemaining(
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.inventory_2_outlined,
+                        size: 48,
+                        color: Pallete.textColor.withOpacity(0.4),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        'Nenhum produto encontrado',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Pallete.textColor.withOpacity(0.6),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            : SliverPadding(
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
+                sliver: SliverGrid(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,       // dois produtos por linha
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
+                    childAspectRatio: 0.85,  // proporção de cada card
+                  ),
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      final product = products[index];
+                      return StockProductCard(
+                        name: product['name'],
+                        category: product['category'],
+                        quantity: product['quantity'],
+                        price: product['price'],
+                        isLowStock: _viewModel.isLowStock(product['quantity']),
+                      );
+                    },
+                    childCount: products.length,
+                  ),
+                ),
+              ),
+      ],
+    );
+  }
+}
