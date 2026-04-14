@@ -56,7 +56,9 @@ class _HomeAttendantScreenState extends State<HomeAttendantScreen> {
           Stack(
             children: [
               IconButton(
-                onPressed: () {},
+                  onPressed: () {
+                  Navigator.pushNamed(context, AppRoutes.attendantNotifications);
+                },
                 icon: const Icon(Icons.notifications, color: Color(0xFF111827)),
               ),
               Positioned(
