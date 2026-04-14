@@ -77,64 +77,62 @@ class OrderItemTile extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             // Miniaturas dos produtos
-            SizedBox(
-              height: 40,
-              child: Row(
-                children: [
-                  ...order.items.take(3).map(
-                    (item) => Container(
-                      width: 40,
-                      height: 40,
-                      margin: const EdgeInsets.only(right: 6),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                        color: Pallete.grayColor,
-                        image: DecorationImage(
-                          image: NetworkImage(item.productImageUrl),
-                          fit: BoxFit.cover,
-                        ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                ...order.items.take(3).map(
+                  (item) => Container(
+                    width: 40,
+                    height: 40,
+                    margin: const EdgeInsets.only(right: 6),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: Pallete.grayColor,
+                      image: DecorationImage(
+                        image: NetworkImage(item.productImageUrl),
+                        fit: BoxFit.cover,
                       ),
                     ),
                   ),
-                  if (order.items.length > 3)
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                        color: Pallete.grayColor,
-                      ),
-                      child: Center(
-                        child: Text(
-                          '+${order.items.length - 3}',
-                          style: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: Pallete.textColor,
-                          ),
-                        ),
-                      ),
+                ),
+                if (order.items.length > 3)
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: Pallete.grayColor,
                     ),
-                  const Spacer(),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'R\$ ${order.totalAmount.toStringAsFixed(2).replaceAll('.', ',')}',
+                    child: Center(
+                      child: Text(
+                        '+${order.items.length - 3}',
                         style: const TextStyle(
+                          fontSize: 12,
                           fontWeight: FontWeight.bold,
-                          fontSize: 15,
-                          color: Color(0xFF291715),
+                          color: Pallete.textColor,
                         ),
                       ),
-                      const SizedBox(height: 2),
-                      _StatusChip(status: order.status),
-                    ],
+                    ),
                   ),
-                ],
-              ),
-            ),
+                const Spacer(),
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      'R\$ ${order.totalAmount.toStringAsFixed(2).replaceAll('.', ',')}',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                        color: Color(0xFF291715),
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    _StatusChip(status: order.status),
+                  ],
+                ),
+              ],
+            )
           ],
         ),
       ),
