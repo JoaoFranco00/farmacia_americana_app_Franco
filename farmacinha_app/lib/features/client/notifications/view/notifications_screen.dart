@@ -4,18 +4,30 @@ import 'package:farmacia_app/features/client/notifications/view_model/notificati
 import 'package:farmacia_app/features/client/notifications/view/widgets/notification_tile.dart';
 
 class NotificationsScreen extends StatefulWidget {
-  const NotificationsScreen({super.key});
+  final NotificationsViewModel? viewModel;
+
+  const NotificationsScreen({super.key, this.viewModel});
 
   @override
   State<NotificationsScreen> createState() => _NotificationsScreenState();
 }
 
 class _NotificationsScreenState extends State<NotificationsScreen> {
-  final NotificationsViewModel viewModel = NotificationsViewModel();
+  late final NotificationsViewModel viewModel;
+  late final bool _ownsViewModel;
+
+  @override
+  void initState() {
+    super.initState();
+    _ownsViewModel = widget.viewModel == null;
+    viewModel = widget.viewModel ?? NotificationsViewModel();
+  }
 
   @override
   void dispose() {
-    viewModel.dispose();
+    if (_ownsViewModel) {
+      viewModel.dispose();
+    }
     super.dispose();
   }
 
