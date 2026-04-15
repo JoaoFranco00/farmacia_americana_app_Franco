@@ -610,13 +610,13 @@ const List<_FavoriteProduct> _initialFavorites = [
 const List<_FavoriteProduct> _initialSuggestions = [
   _FavoriteProduct(
     id: 'protetor-solar',
-    title: 'Protetor Solar Facial FPS 60 Toque Seco',
+    title: 'Protetor Solar Facial FPS 60 Toque Seco 50ml',
     price: 'R\$ 79,90',
     category: 'SKIN HEALTH',
     categoryBg: Color(0xFFFCD400),
     categoryText: Color(0xFF5A4300),
     imageUrl:
-        'https://images.unsplash.com/photo-1556228578-dd6f62134b0d?auto=format&fit=crop&w=600&q=80',
+        'https://images.tcdn.com.br/img/img_prod/1017481/protetor_solar_facial_fps_60_toque_seco_50ml_nivea_sun_32063_1_6eb62f41dba9e6303af5e94de189f110.jpg',
     isFavorite: false,
   ),
   _FavoriteProduct(

@@ -12,6 +12,7 @@ import 'package:farmacia_app/features/client/product_detail/view/product_detail_
 // ── Suas telas ────────────────────────────────────────────────────────────────
 import 'package:farmacia_app/features/client/account/view/account_screen.dart';
 import 'package:farmacia_app/features/client/notifications/view/notifications_screen.dart';
+import 'package:farmacia_app/features/client/notifications/view_model/notifications_view_model.dart';
 
 class HomeClientScreen extends StatefulWidget {
   const HomeClientScreen({super.key});
@@ -22,11 +23,13 @@ class HomeClientScreen extends StatefulWidget {
 
 class _HomeClientScreenState extends State<HomeClientScreen> {
   final HomeClientViewModel viewModel = HomeClientViewModel();
+  final NotificationsViewModel notificationsViewModel = NotificationsViewModel();
   int _currentTabIndex = 0;
 
   @override
   void dispose() {
     viewModel.dispose();
+    notificationsViewModel.dispose();
     super.dispose();
   }
 
@@ -58,14 +61,25 @@ class _HomeClientScreenState extends State<HomeClientScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Pallete.backgroundColor,
-      appBar: CustomAppBar(
-        onMenuTap: () => debugPrint('Abrir Drawer'),
-        onNotificationTap: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => const NotificationsScreen()),
-          );
-        },
-        onLogoTap: () => debugPrint('Logo clicada'),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight),
+        child: ListenableBuilder(
+          listenable: notificationsViewModel,
+          builder: (context, _) => CustomAppBar(
+            onMenuTap: () => debugPrint('Abrir Drawer'),
+            onNotificationTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder:
+                      (_) =>
+                          NotificationsScreen(viewModel: notificationsViewModel),
+                ),
+              );
+            },
+            onLogoTap: () => debugPrint('Logo clicada'),
+            unreadCount: notificationsViewModel.unreadCount,
+          ),
+        ),
       ),
       body: ListenableBuilder(
         listenable: viewModel,
