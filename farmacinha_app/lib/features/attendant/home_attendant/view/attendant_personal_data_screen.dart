@@ -2,175 +2,146 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:farmacia_app/app/app_routes.dart';
 import 'package:farmacia_app/core/palette/pallete.dart';
-import 'package:farmacia_app/features/attendant/home_attendant/view_model/attendant_profile_data_store.dart';
+import 'package:farmacia_app/features/attendant/home_attendant/view_model/attendant_personal_viewl_model.dart';
+
 
 class AttendantPersonalDataScreen extends StatefulWidget {
   const AttendantPersonalDataScreen({super.key});
 
   @override
-  State<AttendantPersonalDataScreen> createState() => _AttendantPersonalDataScreenState();
+  State<AttendantPersonalDataScreen> createState() =>
+      _AttendantPersonalDataScreenState();
 }
 
-class _AttendantPersonalDataScreenState extends State<AttendantPersonalDataScreen> {
-  late final TextEditingController _nameController;
-  late final TextEditingController _emailController;
-  late final TextEditingController _cpfController;
-  late final TextEditingController _phoneController;
-
-  final FocusNode _nameFocusNode = FocusNode();
-  final FocusNode _emailFocusNode = FocusNode();
-  final FocusNode _cpfFocusNode = FocusNode();
-  final FocusNode _phoneFocusNode = FocusNode();
-
-  bool _isNamePrefilled = true;
-  bool _isEmailPrefilled = true;
-  bool _isCpfPrefilled = true;
-  bool _isPhonePrefilled = true;
+class _AttendantPersonalDataScreenState
+    extends State<AttendantPersonalDataScreen> {
+  late final AttendantPersonalDataViewModel _viewModel;
 
   @override
   void initState() {
     super.initState();
-    final profile = AttendantProfileDataStore.instance.data;
-
-    _nameController = TextEditingController(text: profile.fullName);
-    _emailController = TextEditingController(text: profile.email);
-    _cpfController = TextEditingController(text: profile.cpf);
-    _phoneController = TextEditingController(text: profile.phone);
-
-    _nameFocusNode.addListener(
-      () => _clearPrefilledOnFocus(
-        focusNode: _nameFocusNode,
-        controller: _nameController,
-        isPrefilled: _isNamePrefilled,
-        onChanged: (value) => _isNamePrefilled = value,
-      ),
-    );
-    _emailFocusNode.addListener(
-      () => _clearPrefilledOnFocus(
-        focusNode: _emailFocusNode,
-        controller: _emailController,
-        isPrefilled: _isEmailPrefilled,
-        onChanged: (value) => _isEmailPrefilled = value,
-      ),
-    );
-    _cpfFocusNode.addListener(
-      () => _clearPrefilledOnFocus(
-        focusNode: _cpfFocusNode,
-        controller: _cpfController,
-        isPrefilled: _isCpfPrefilled,
-        onChanged: (value) => _isCpfPrefilled = value,
-      ),
-    );
-    _phoneFocusNode.addListener(
-      () => _clearPrefilledOnFocus(
-        focusNode: _phoneFocusNode,
-        controller: _phoneController,
-        isPrefilled: _isPhonePrefilled,
-        onChanged: (value) => _isPhonePrefilled = value,
-      ),
-    );
+    _viewModel = AttendantPersonalDataViewModel();
   }
 
   @override
   void dispose() {
-    _nameFocusNode.dispose();
-    _emailFocusNode.dispose();
-    _cpfFocusNode.dispose();
-    _phoneFocusNode.dispose();
-    _nameController.dispose();
-    _emailController.dispose();
-    _cpfController.dispose();
-    _phoneController.dispose();
+    _viewModel.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFFFF8F7),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFFFFF8F7),
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: Pallete.primaryRed),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        title: const Text(
-          'Dados Pessoais',
-          style: TextStyle(
-            color: Pallete.primaryRed,
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
+    return ListenableBuilder(
+      listenable: _viewModel,
+      builder: (context, _) {
+        return Scaffold(
+          backgroundColor: const Color(0xFFFFF8F7),
+          appBar: AppBar(
+            backgroundColor: const Color(0xFFFFF8F7),
+            elevation: 0,
+            leading: IconButton(
+              icon: const Icon(
+                Icons.arrow_back_rounded,
+                color: Pallete.primaryRed,
+              ),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            title: const Text(
+              'Dados Pessoais',
+              style: TextStyle(
+                color: Pallete.primaryRed,
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
+            ),
           ),
-        ),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(24, 18, 24, 32),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildInputLabel('NOME COMPLETO'),
-            _buildTextField(
-              controller: _nameController,
-              hint: 'Digite seu nome completo',
-              icon: Icons.person,
-              focusNode: _nameFocusNode,
-              isPrefilled: _isNamePrefilled,
-              keyboardType: TextInputType.text,
-              textCapitalization: TextCapitalization.words,
+          body: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(24, 18, 24, 32),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildInputLabel('NOME COMPLETO'),
+                _buildTextField(
+                  controller: _viewModel.nameController,
+                  hint: 'Digite seu nome completo',
+                  icon: Icons.person,
+                  focusNode: _viewModel.nameFocusNode,
+                  isPrefilled: _viewModel.isNamePrefilled,
+                  keyboardType: TextInputType.text,
+                  textCapitalization: TextCapitalization.words,
+                ),
+                const SizedBox(height: 20),
+                _buildInputLabel('E-MAIL'),
+                _buildTextField(
+                  controller: _viewModel.emailController,
+                  hint: 'seu@email.com',
+                  icon: Icons.mail,
+                  focusNode: _viewModel.emailFocusNode,
+                  isPrefilled: _viewModel.isEmailPrefilled,
+                  keyboardType: TextInputType.emailAddress,
+                ),
+                const SizedBox(height: 20),
+                _buildInputLabel('CPF'),
+                _buildTextField(
+                  controller: _viewModel.cpfController,
+                  hint: '000.000.000-00',
+                  icon: Icons.badge,
+                  focusNode: _viewModel.cpfFocusNode,
+                  isPrefilled: _viewModel.isCpfPrefilled,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly,
+                    CpfInputFormatter(),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                _buildInputLabel('TELEFONE'),
+                _buildTextField(
+                  controller: _viewModel.phoneController,
+                  hint: '(00) 00000-0000',
+                  icon: Icons.call,
+                  focusNode: _viewModel.phoneFocusNode,
+                  isPrefilled: _viewModel.isPhonePrefilled,
+                  keyboardType: TextInputType.phone,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly,
+                    PhoneInputFormatter(),
+                  ],
+                ),
+                const SizedBox(height: 28),
+                _buildSecurityCard(),
+                const SizedBox(height: 32),
+                _buildSaveButton(),
+              ],
             ),
-            const SizedBox(height: 20),
-            _buildInputLabel('E-MAIL'),
-            _buildTextField(
-              controller: _emailController,
-              hint: 'seu@email.com',
-              icon: Icons.mail,
-              focusNode: _emailFocusNode,
-              isPrefilled: _isEmailPrefilled,
-              keyboardType: TextInputType.emailAddress,
-            ),
-            const SizedBox(height: 20),
-            _buildInputLabel('CPF'),
-            _buildTextField(
-              controller: _cpfController,
-              hint: '000.000.000-00',
-              icon: Icons.badge,
-              focusNode: _cpfFocusNode,
-              isPrefilled: _isCpfPrefilled,
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly, CpfInputFormatter()],
-            ),
-            const SizedBox(height: 20),
-            _buildInputLabel('TELEFONE'),
-            _buildTextField(
-              controller: _phoneController,
-              hint: '(00) 00000-0000',
-              icon: Icons.call,
-              focusNode: _phoneFocusNode,
-              isPrefilled: _isPhonePrefilled,
-              keyboardType: TextInputType.phone,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly, PhoneInputFormatter()],
-            ),
-            const SizedBox(height: 28),
-            _buildSecurityCard(),
-            const SizedBox(height: 32),
-            _buildSaveButton(),
-          ],
-        ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 3,
-        onTap: _onBottomNavTap,
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: Pallete.primaryRed,
-        unselectedItemColor: const Color(0xFF9F9F9F),
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home_rounded), label: 'INÍCIO'),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'BUSCAR'),
-          BottomNavigationBarItem(icon: Icon(Icons.chat_bubble), label: 'CHAT'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'PERFIL'),
-        ],
-      ),
+          ),
+          bottomNavigationBar: BottomNavigationBar(
+            currentIndex: 3,
+            onTap: (index) => _onBottomNavTap(context, index),
+            type: BottomNavigationBarType.fixed,
+            selectedItemColor: Pallete.primaryRed,
+            unselectedItemColor: const Color(0xFF9F9F9F),
+            items: const [
+              BottomNavigationBarItem(
+                icon: Icon(Icons.home_rounded),
+                label: 'INÍCIO',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.search),
+                label: 'BUSCAR',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.chat_bubble),
+                label: 'CHAT',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.person),
+                label: 'PERFIL',
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -214,7 +185,9 @@ class _AttendantPersonalDataScreenState extends State<AttendantPersonalDataScree
         enableSuggestions: true,
         style: TextStyle(
           fontSize: 16,
-          color: isPrefilled ? const Color(0xFF9B8D8B) : const Color(0xFF1C1617),
+          color: isPrefilled
+              ? const Color(0xFF9B8D8B)
+              : const Color(0xFF1C1617),
           fontWeight: FontWeight.w500,
         ),
         decoration: InputDecoration(
@@ -228,23 +201,13 @@ class _AttendantPersonalDataScreenState extends State<AttendantPersonalDataScree
             padding: const EdgeInsets.only(right: 20),
             child: Icon(icon, color: const Color(0xFFBBA9A7), size: 24),
           ),
-          suffixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 0),
+          suffixIconConstraints: const BoxConstraints(
+            minWidth: 0,
+            minHeight: 0,
+          ),
         ),
       ),
     );
-  }
-
-  void _clearPrefilledOnFocus({
-    required FocusNode focusNode,
-    required TextEditingController controller,
-    required bool isPrefilled,
-    required ValueChanged<bool> onChanged,
-  }) {
-    if (!focusNode.hasFocus || !isPrefilled) return;
-    setState(() {
-      controller.clear();
-      onChanged(false);
-    });
   }
 
   Widget _buildSecurityCard() {
@@ -306,7 +269,7 @@ class _AttendantPersonalDataScreenState extends State<AttendantPersonalDataScree
           ),
           const SizedBox(height: 18),
           GestureDetector(
-            onTap: _showChangePasswordSheet,
+            onTap: () => _showChangePasswordSheet(context),
             child: const Text(
               'Alterar Senha',
               style: TextStyle(
@@ -360,18 +323,12 @@ class _AttendantPersonalDataScreenState extends State<AttendantPersonalDataScree
   }
 
   void _savePersonalData() {
-    AttendantProfileDataStore.instance.updatePersonalData(
-      fullName: _nameController.text.trim(),
-      email: _emailController.text.trim(),
-      cpf: _cpfController.text.trim(),
-      phone: _phoneController.text.trim(),
-    );
-
+    _viewModel.savePersonalData();
     _showInfo('Dados salvos com sucesso!');
     Navigator.of(context).pop();
   }
 
-  void _onBottomNavTap(int index) {
+  void _onBottomNavTap(BuildContext context, int index) {
     if (index == 3) {
       Navigator.pushReplacementNamed(context, AppRoutes.attendantProfile);
       return;
@@ -396,14 +353,12 @@ class _AttendantPersonalDataScreenState extends State<AttendantPersonalDataScree
     );
   }
 
-  void _showChangePasswordSheet() {
+  void _showChangePasswordSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => _ChangePasswordSheet(
-        onMessage: _showGlobalMessage,
-      ),
+      builder: (_) => _ChangePasswordSheet(onMessage: _showGlobalMessage),
     );
   }
 
@@ -412,7 +367,9 @@ class _AttendantPersonalDataScreenState extends State<AttendantPersonalDataScree
       context: context,
       useRootNavigator: true,
       builder: (dialogContext) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
         content: Text(message),
         actions: [
           TextButton(
@@ -480,114 +437,118 @@ class PhoneInputFormatter extends TextInputFormatter {
 class _ChangePasswordSheet extends StatefulWidget {
   final ValueChanged<String> onMessage;
 
-  const _ChangePasswordSheet({
-    required this.onMessage,
-  });
+  const _ChangePasswordSheet({required this.onMessage});
 
   @override
   State<_ChangePasswordSheet> createState() => _ChangePasswordSheetState();
 }
 
 class _ChangePasswordSheetState extends State<_ChangePasswordSheet> {
-  final TextEditingController _currentPasswordController = TextEditingController();
-  final TextEditingController _newPasswordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
-
-  bool _hideCurrent = true;
-  bool _hideNew = true;
-  bool _hideConfirm = true;
-
-  bool get _hasMinLength => _newPasswordController.text.length >= 6;
-  bool get _hasUppercase => RegExp(r'[A-Z]').hasMatch(_newPasswordController.text);
-  bool get _hasLowercase => RegExp(r'[a-z]').hasMatch(_newPasswordController.text);
-  bool get _hasNumber => RegExp(r'[0-9]').hasMatch(_newPasswordController.text);
+  late final ChangePasswordViewModel _passwordViewModel;
 
   @override
   void initState() {
     super.initState();
-    _newPasswordController.addListener(() => setState(() {}));
+    _passwordViewModel = ChangePasswordViewModel();
   }
 
   @override
   void dispose() {
-    _currentPasswordController.dispose();
-    _newPasswordController.dispose();
-    _confirmPasswordController.dispose();
+    _passwordViewModel.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(
-        left: 16,
-        right: 16,
-        top: 16,
-        bottom: MediaQuery.of(context).viewInsets.bottom + 16,
-      ),
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(24),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Alterar Senha',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF1E1615),
-              ),
+    return ListenableBuilder(
+      listenable: _passwordViewModel,
+      builder: (context, _) {
+        return Padding(
+          padding: EdgeInsets.only(
+            left: 16,
+            right: 16,
+            top: 16,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+          ),
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(24),
             ),
-            const SizedBox(height: 16),
-            _buildPasswordField(
-              controller: _currentPasswordController,
-              label: 'Senha atual',
-              obscureText: _hideCurrent,
-              onToggleVisibility: () => setState(() => _hideCurrent = !_hideCurrent),
-            ),
-            const SizedBox(height: 12),
-            _buildPasswordField(
-              controller: _newPasswordController,
-              label: 'Nova senha',
-              obscureText: _hideNew,
-              onToggleVisibility: () => setState(() => _hideNew = !_hideNew),
-            ),
-            const SizedBox(height: 12),
-            _buildPasswordField(
-              controller: _confirmPasswordController,
-              label: 'Confirmar nova senha',
-              obscureText: _hideConfirm,
-              onToggleVisibility: () => setState(() => _hideConfirm = !_hideConfirm),
-            ),
-            const SizedBox(height: 14),
-            _buildRequirement('Mínimo de 6 caracteres', _hasMinLength),
-            _buildRequirement('1 letra maiúscula', _hasUppercase),
-            _buildRequirement('1 letra minúscula', _hasLowercase),
-            _buildRequirement('1 caractere numérico', _hasNumber),
-            const SizedBox(height: 18),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: _saveNewPassword,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Pallete.primaryRed,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Alterar Senha',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF1E1615),
                   ),
                 ),
-                child: const Text('Salvar nova senha'),
-              ),
+                const SizedBox(height: 16),
+                _buildPasswordField(
+                  controller: _passwordViewModel.currentPasswordController,
+                  label: 'Senha atual',
+                  obscureText: _passwordViewModel.hideCurrent,
+                  onToggleVisibility:
+                      _passwordViewModel.toggleCurrentVisibility,
+                ),
+                const SizedBox(height: 12),
+                _buildPasswordField(
+                  controller: _passwordViewModel.newPasswordController,
+                  label: 'Nova senha',
+                  obscureText: _passwordViewModel.hideNew,
+                  onToggleVisibility: _passwordViewModel.toggleNewVisibility,
+                ),
+                const SizedBox(height: 12),
+                _buildPasswordField(
+                  controller: _passwordViewModel.confirmPasswordController,
+                  label: 'Confirmar nova senha',
+                  obscureText: _passwordViewModel.hideConfirm,
+                  onToggleVisibility:
+                      _passwordViewModel.toggleConfirmVisibility,
+                ),
+                const SizedBox(height: 14),
+                _buildRequirement(
+                  'Mínimo de 6 caracteres',
+                  _passwordViewModel.hasMinLength,
+                ),
+                _buildRequirement(
+                  '1 letra maiúscula',
+                  _passwordViewModel.hasUppercase,
+                ),
+                _buildRequirement(
+                  '1 letra minúscula',
+                  _passwordViewModel.hasLowercase,
+                ),
+                _buildRequirement(
+                  '1 caractere numérico',
+                  _passwordViewModel.hasNumber,
+                ),
+                const SizedBox(height: 18),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: _saveNewPassword,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Pallete.primaryRed,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                    child: const Text('Salvar nova senha'),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -607,7 +568,9 @@ class _ChangePasswordSheetState extends State<_ChangePasswordSheet> {
         ),
         suffixIcon: IconButton(
           onPressed: onToggleVisibility,
-          icon: Icon(obscureText ? Icons.visibility_off : Icons.visibility),
+          icon: Icon(
+            obscureText ? Icons.visibility_off : Icons.visibility,
+          ),
         ),
       ),
     );
@@ -638,21 +601,12 @@ class _ChangePasswordSheetState extends State<_ChangePasswordSheet> {
   }
 
   void _saveNewPassword() {
-    final hasAllRules = _hasMinLength && _hasUppercase && _hasLowercase && _hasNumber;
-    if (_currentPasswordController.text.isEmpty) {
-      widget.onMessage('Informe a senha atual.');
-      return;
-    }
-    if (!hasAllRules) {
-      widget.onMessage('A nova senha não atende aos requisitos.');
-      return;
-    }
-    if (_newPasswordController.text != _confirmPasswordController.text) {
-      widget.onMessage('A confirmação da senha não confere.');
-      return;
+    final result = _passwordViewModel.validate();
+
+    if (result.shouldCloseSheet) {
+      Navigator.of(context).pop();
     }
 
-    Navigator.of(context).pop();
-    widget.onMessage('Senha alterada com sucesso!');
+    widget.onMessage(result.message);
   }
 }

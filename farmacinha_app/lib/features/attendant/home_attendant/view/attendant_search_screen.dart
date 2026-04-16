@@ -1,6 +1,10 @@
+// attendant_search_screen.dart
+
 import 'package:flutter/material.dart';
 import 'package:farmacia_app/app/app_routes.dart';
 import 'package:farmacia_app/core/palette/pallete.dart';
+import 'package:farmacia_app/features/attendant/home_attendant/data/models/attendant_search_client_model.dart';
+import 'package:farmacia_app/features/attendant/home_attendant/view_model/attendant_search__view_model.dart';
 
 class AttendantSearchScreen extends StatefulWidget {
   const AttendantSearchScreen({super.key});
@@ -10,29 +14,17 @@ class AttendantSearchScreen extends StatefulWidget {
 }
 
 class _AttendantSearchScreenState extends State<AttendantSearchScreen> {
-  final TextEditingController _searchController = TextEditingController();
+  late final AttendantSearchViewModel _viewModel;
 
-  final List<_RecentClient> _recentClients = const [
-    _RecentClient(initials: 'AM', name: 'ADRIANA MENDONÇA', cpf: '452.XXX.XX8-12', timeLabel: 'HÁ 2 HORAS'),
-    _RecentClient(initials: 'JS', name: 'JOÃO SILVA COSTA', cpf: '128.XXX.XX7-90', timeLabel: 'ONTEM'),
-    _RecentClient(initials: 'RC', name: 'ROBERTA CAVALCANTI', cpf: '832.XXX.XX3-44', timeLabel: '15 OUT'),
-    _RecentClient(initials: 'PB', name: 'PAULO BATISTA', cpf: '091.XXX.XX1-22', timeLabel: '12 OUT'),
-  ];
-
-  List<_RecentClient> get _filteredClients {
-    final query = _searchController.text.trim().toLowerCase();
-    if (query.isEmpty) return _recentClients;
-
-    return _recentClients.where((client) {
-      return client.name.toLowerCase().contains(query) ||
-          client.cpf.toLowerCase().contains(query) ||
-          client.initials.toLowerCase().contains(query);
-    }).toList();
+  @override
+  void initState() {
+    super.initState();
+    _viewModel = AttendantSearchViewModel();
   }
 
   @override
   void dispose() {
-    _searchController.dispose();
+    _viewModel.dispose();
     super.dispose();
   }
 
@@ -74,10 +66,10 @@ class _AttendantSearchScreenState extends State<AttendantSearchScreen> {
           ),
         ],
       ),
-      body: AnimatedBuilder(
-        animation: _searchController,
+      body: ListenableBuilder(
+        listenable: _viewModel,
         builder: (context, _) {
-          final clients = _filteredClients;
+          final clients = _viewModel.clients;
 
           return SingleChildScrollView(
             padding: const EdgeInsets.fromLTRB(16, 18, 16, 28),
@@ -86,12 +78,20 @@ class _AttendantSearchScreenState extends State<AttendantSearchScreen> {
               children: [
                 const Text(
                   'Central de Atendimento',
-                  style: TextStyle(fontSize: 52 / 2, fontWeight: FontWeight.w800, color: Color(0xFF151515)),
+                  style: TextStyle(
+                    fontSize: 52 / 2,
+                    fontWeight: FontWeight.w800,
+                    color: Color(0xFF151515),
+                  ),
                 ),
                 const SizedBox(height: 8),
                 const Text(
                   'Localize o cliente para iniciar o atendimento\nfarmacêutico.',
-                  style: TextStyle(fontSize: 18 / 1.25, color: Color(0xFF4A2C2C), height: 1.45),
+                  style: TextStyle(
+                    fontSize: 18 / 1.25,
+                    color: Color(0xFF4A2C2C),
+                    height: 1.45,
+                  ),
                 ),
                 const SizedBox(height: 24),
                 Container(
@@ -104,31 +104,45 @@ class _AttendantSearchScreenState extends State<AttendantSearchScreen> {
                     children: [
                       const Padding(
                         padding: EdgeInsets.symmetric(horizontal: 10),
-                        child: Icon(Icons.person_search_outlined, color: Color(0xFF6E4B4B)),
+                        child: Icon(
+                          Icons.person_search_outlined,
+                          color: Color(0xFF6E4B4B),
+                        ),
                       ),
                       Expanded(
                         child: TextField(
-                          controller: _searchController,
+                          controller: _viewModel.searchController,
                           decoration: const InputDecoration(
                             hintText: 'Digite o CPF ou Nome',
                             border: InputBorder.none,
-                            hintStyle: TextStyle(fontSize: 18 / 1.2, color: Color(0xFF9A9A9A)),
+                            hintStyle: TextStyle(
+                              fontSize: 18 / 1.2,
+                              color: Color(0xFF9A9A9A),
+                            ),
                           ),
                         ),
                       ),
                       SizedBox(
                         height: 58,
                         child: ElevatedButton(
-                          onPressed: () => setState(() {}),
+                          onPressed: _viewModel.onSearchPressed,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Pallete.primaryRed,
                             foregroundColor: Colors.white,
                             elevation: 0,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
                           ),
                           child: const Padding(
                             padding: EdgeInsets.symmetric(horizontal: 18),
-                            child: Text('BUSCAR', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18 / 1.2)),
+                            child: Text(
+                              'BUSCAR',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w800,
+                                fontSize: 18 / 1.2,
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -138,11 +152,19 @@ class _AttendantSearchScreenState extends State<AttendantSearchScreen> {
                 const SizedBox(height: 26),
                 const Row(
                   children: [
-                    Icon(Icons.history_toggle_off, color: Pallete.primaryRed, size: 30),
+                    Icon(
+                      Icons.history_toggle_off,
+                      color: Pallete.primaryRed,
+                      size: 30,
+                    ),
                     SizedBox(width: 10),
                     Text(
                       'Buscas\nRecentes',
-                      style: TextStyle(fontSize: 21 / 1.3, fontWeight: FontWeight.w700, color: Color(0xFF111111)),
+                      style: TextStyle(
+                        fontSize: 21 / 1.3,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF111111),
+                      ),
                     ),
                   ],
                 ),
@@ -150,7 +172,9 @@ class _AttendantSearchScreenState extends State<AttendantSearchScreen> {
                 if (clients.isEmpty)
                   const Padding(
                     padding: EdgeInsets.symmetric(vertical: 24),
-                    child: Center(child: Text('Nenhum cliente encontrado.')),
+                    child: Center(
+                      child: Text('Nenhum cliente encontrado.'),
+                    ),
                   )
                 else
                   ...clients.map(
@@ -185,7 +209,10 @@ class _AttendantSearchScreenState extends State<AttendantSearchScreen> {
                         child: CircleAvatar(
                           radius: 24,
                           backgroundColor: Color(0xFFF0D467),
-                          child: Icon(Icons.lightbulb, color: Color(0xFF4A3C0A)),
+                          child: Icon(
+                            Icons.lightbulb,
+                            color: Color(0xFF4A3C0A),
+                          ),
                         ),
                       ),
                       SizedBox(width: 14),
@@ -193,11 +220,22 @@ class _AttendantSearchScreenState extends State<AttendantSearchScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Dica de Atendimento', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 33 / 2)),
+                            Text(
+                              'Dica rápida',
+                              style: TextStyle(
+                                fontSize: 18 / 1.15,
+                                fontWeight: FontWeight.w800,
+                                color: Color(0xFF1A1A1A),
+                              ),
+                            ),
                             SizedBox(height: 8),
                             Text(
                               'Sempre verifique se o cliente possui\nconvênio ativo no sistema\nAmericana Plus para garantir os\nmelhores descontos em\nmedicamentos de uso contínuo.',
-                              style: TextStyle(fontSize: 16 / 1.2, color: Color(0xFF402626), height: 1.5),
+                              style: TextStyle(
+                                fontSize: 16 / 1.2,
+                                color: Color(0xFF402626),
+                                height: 1.5,
+                              ),
                             ),
                           ],
                         ),
@@ -220,11 +258,9 @@ class _AttendantSearchScreenState extends State<AttendantSearchScreen> {
 
           if (index == 2) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Tela de chat ainda não disponível.'),
-              ),
+              const SnackBar(content: Text('Tela de chat ainda não disponível.')),
             );
-                return;
+            return;
           }
 
           if (index == 3) {
@@ -235,10 +271,22 @@ class _AttendantSearchScreenState extends State<AttendantSearchScreen> {
         selectedItemColor: Pallete.primaryRed,
         unselectedItemColor: const Color(0xFF9F9F9F),
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home_rounded), label: 'INÍCIO'),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'BUSCAR'),
-          BottomNavigationBarItem(icon: Icon(Icons.chat_bubble), label: 'CHAT'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'PERFIL'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home_rounded),
+            label: 'INÍCIO',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.search),
+            label: 'BUSCAR',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.chat_bubble),
+            label: 'CHAT',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'PERFIL',
+          ),
         ],
       ),
     );
@@ -246,10 +294,13 @@ class _AttendantSearchScreenState extends State<AttendantSearchScreen> {
 }
 
 class _RecentClientCard extends StatelessWidget {
-  final _RecentClient client;
+  final AttendantSearchClient client;
   final VoidCallback onTap;
 
-  const _RecentClientCard({required this.client, required this.onTap});
+  const _RecentClientCard({
+    required this.client,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -274,9 +325,9 @@ class _RecentClientCard extends StatelessWidget {
                   child: Text(
                     client.initials,
                     style: const TextStyle(
-                      color: Pallete.primaryRed,
+                      fontSize: 20,
                       fontWeight: FontWeight.w800,
-                      fontSize: 32 / 2,
+                      color: Color(0xFF2B2B2B),
                     ),
                   ),
                 ),
@@ -288,51 +339,52 @@ class _RecentClientCard extends StatelessWidget {
                   children: [
                     Text(
                       client.name,
-                      style: const TextStyle(fontSize: 19 / 1.2, fontWeight: FontWeight.w800),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      'CPF: ${client.cpf}',
                       style: const TextStyle(
-                        fontSize: 16 / 1.2,
-                        color: Color(0xFF8B8B8B),
+                        fontSize: 16,
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFF101010),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      client.cpf,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Color(0xFF6F6F6F),
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                     const SizedBox(height: 6),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 3,
+                      ),
                       decoration: BoxDecoration(
                         color: const Color(0xFFE9E9E9),
                         borderRadius: BorderRadius.circular(3),
                       ),
                       child: Text(
                         client.timeLabel,
-                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFF444444)),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF444444),
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
-              const Icon(Icons.chevron_right, color: Color(0xFFD0D0D0), size: 30),
+              const Icon(
+                Icons.chevron_right,
+                color: Color(0xFFD0D0D0),
+                size: 30,
+              ),
             ],
           ),
         ),
       ),
     );
   }
-}
-
-class _RecentClient {
-  final String initials;
-  final String name;
-  final String cpf;
-  final String timeLabel;
-
-  const _RecentClient({
-    required this.initials,
-    required this.name,
-    required this.cpf,
-    required this.timeLabel,
-  });
 }
