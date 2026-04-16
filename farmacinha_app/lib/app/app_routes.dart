@@ -19,7 +19,7 @@ import 'package:farmacia_app/features/client/notifications/view/notifications_sc
 import 'package:farmacia_app/features/client/purchase_history/view/purchase_history_screen.dart';
 import 'package:farmacia_app/features/client/account/view/personal_data_screen.dart';
 import 'package:farmacia_app/features/client/account/view/favorite_products_screen.dart';
-import 'package:farmacia_app/features/client/search/view/search_result_view.dart'; 
+import 'package:farmacia_app/features/client/search/view/search_result_view.dart';
 import 'package:farmacia_app/features/client/product_detail/view/product_detail_view.dart';
 import 'package:farmacia_app/features/client/home_client/data/models/product_model.dart'; // Import necessário para o Cast do argumento
 
@@ -54,28 +54,25 @@ class AppRoutes {
   static const String productDetail = '/product_detail';
 
   static Map<String, WidgetBuilder> get routes => {
-        splash: (_) => SplashScreen(),
-        welcome: (_) => WelcomeScreen(),
-        login: (_) => LoginScreen(),
-        register: (_) => RegisterScreen(),
-        homeClient: (_) => HomeClientScreen(),
-        homeAttendant: (_) => HomeAttendantScreen(),
-        attendantSearch: (_) => AttendantSearchScreen(),
-        attendantChat: (_) => AttendantChatScreen(),
-        attendantNotifications: (_) => AttendantNotificationsScreen(),
-        attendantProfile: (_) => AttendantProfileScreen(),
-        attendantPersonalData: (_) => AttendantPersonalDataScreen(),
-        account: (_) => AccountScreen(),
-        orders: (_) => OrdersScreen(),
-        notifications: (_) => NotificationsScreen(),
-        purchaseHistory: (_) => PurchaseHistoryScreen(),
-        homeManager: (_) => ManagerShellScreen(),
-        personalData: (_) => PersonalDataScreen(),
-        favorites: (_) => FavoriteProductsScreen(),
-        searchResult: (_) => SearchResultView(),
-        productDetail: (context) {
-          final product = ModalRoute.of(context)!.settings.arguments as Product;
-          return ProductDetailView(product: product);
-        },
-      };
+    splash: (_) => SplashScreen(),
+    welcome: (_) => WelcomeScreen(),
+    login: (_) => LoginScreen(),
+    register: (_) => RegisterScreen(),
+    homeClient: (_) => HomeClientScreen(),
+    homeAttendant: (_) => HomeAttendantScreen(),
+    attendantSearch: (_) => AttendantSearchScreen(),
+    attendantChat: (_) => AttendantChatScreen(),
+    attendantNotifications: (_) => AttendantNotificationsScreen(),
+    attendantProfile: (_) => AttendantProfileScreen(),
+    attendantPersonalData: (_) => AttendantPersonalDataScreen(),
+    account: (_) => AccountScreen(),
+    orders: (_) => OrdersScreen(),
+    notifications: (_) => NotificationsScreen(),
+    purchaseHistory: (_) => PurchaseHistoryScreen(),
+    homeManager: (_) => ManagerShellScreen(),
+    personalData: (_) => PersonalDataScreen(),
+    favorites: (_) => FavoriteProductsScreen(),
+    searchResult: (_) => SearchResultScreen(),
+    productDetail: (_) => ProductDetailScreen(),
+  };
 }
