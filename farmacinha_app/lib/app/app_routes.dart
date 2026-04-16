@@ -12,13 +12,16 @@ import 'package:farmacia_app/features/attendant/home_attendant/view/attendant_no
 import 'package:farmacia_app/features/attendant/home_attendant/view/attendant_profile_screen.dart';
 import 'package:farmacia_app/features/attendant/home_attendant/view/attendant_personal_data_screen.dart';
 
-// ── Rotas das features do cliente  ──────────────────────────────────────
+// ── Rotas das features do cliente ──────────────────────────────────────
 import 'package:farmacia_app/features/client/account/view/account_screen.dart';
 import 'package:farmacia_app/features/client/orders/list/view/orders_screen.dart';
 import 'package:farmacia_app/features/client/notifications/view/notifications_screen.dart';
 import 'package:farmacia_app/features/client/purchase_history/view/purchase_history_screen.dart';
 import 'package:farmacia_app/features/client/account/view/personal_data_screen.dart';
 import 'package:farmacia_app/features/client/account/view/favorite_products_screen.dart';
+import 'package:farmacia_app/features/client/search/view/search_result_view.dart'; 
+import 'package:farmacia_app/features/client/product_detail/view/product_detail_view.dart';
+import 'package:farmacia_app/features/client/home_client/data/models/product_model.dart'; // Import necessário para o Cast do argumento
 
 // ── Rotas do Gerente ───────────────────────────────────────────────────────────
 import 'package:farmacia_app/features/manager/manager_shell_screen.dart';
@@ -34,7 +37,7 @@ class AppRoutes {
   static const String homeClient = '/home_client';
   static const String homeAttendant = '/home_attendant';
   static const String attendantSearch = '/attendant_search';
-    static const String attendantChat = '/attendant_chat';
+  static const String attendantChat = '/attendant_chat';
   static const String attendantNotifications = '/attendant_notifications';
   static const String attendantProfile = '/attendant_profile';
   static const String attendantPersonalData = '/attendant_personal_data';
@@ -47,6 +50,8 @@ class AppRoutes {
   static const String purchaseHistory = '/purchase_history';
   static const String personalData = '/personal_data';
   static const String favorites = '/favorites';
+  static const String searchResult = '/search_result';
+  static const String productDetail = '/product_detail';
 
   static Map<String, WidgetBuilder> get routes => {
         splash: (_) => SplashScreen(),
@@ -67,5 +72,10 @@ class AppRoutes {
         homeManager: (_) => ManagerShellScreen(),
         personalData: (_) => PersonalDataScreen(),
         favorites: (_) => FavoriteProductsScreen(),
+        searchResult: (_) => SearchResultView(),
+        productDetail: (context) {
+          final product = ModalRoute.of(context)!.settings.arguments as Product;
+          return ProductDetailView(product: product);
+        },
       };
 }
