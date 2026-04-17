@@ -8,12 +8,19 @@ class AttendantChatViewModel extends ChangeNotifier {
   final List<AttendantSearchClient> _allClients =
       MockAttendantRecentClients.getClients();
   List<AttendantSearchClient> _filteredClients = [];
+  String? _selectedClientId;
 
   List<AttendantSearchClient> get clients => _filteredClients;
+  String? get selectedClientId => _selectedClientId;
 
   AttendantChatViewModel() {
     _filteredClients = List<AttendantSearchClient>.from(_allClients);
     searchController.addListener(_applyFilters);
+  }
+
+  void selectClient(String clientId) {
+    _selectedClientId = clientId;
+    notifyListeners();
   }
 
   void _applyFilters() {

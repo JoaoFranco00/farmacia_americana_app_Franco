@@ -13,11 +13,28 @@ class AttendantChatScreen extends StatefulWidget {
 
 class _AttendantChatScreenState extends State<AttendantChatScreen> {
   late final AttendantChatViewModel _viewModel;
+  bool _didSyncRouteSelection = false;
 
   @override
   void initState() {
     super.initState();
     _viewModel = AttendantChatViewModel();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (_didSyncRouteSelection) return;
+
+    final selectedClientId =
+        ModalRoute.of(context)?.settings.arguments as String?;
+
+    if (selectedClientId != null) {
+      _viewModel.selectClient(selectedClientId);
+    }
+
+    _didSyncRouteSelection = true;
   }
 
   @override
@@ -28,8 +45,6 @@ class _AttendantChatScreenState extends State<AttendantChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final selectedClientId = ModalRoute.of(context)?.settings.arguments as String?;
-
     return Scaffold(
       backgroundColor: const Color(0xFFE9E9E9),
       appBar: AppBar(
@@ -80,7 +95,7 @@ class _AttendantChatScreenState extends State<AttendantChatScreen> {
                 const Text(
                   'Conversas Ativas',
                   style: TextStyle(
-                    fontSize: 43 / 2,
+                    fontSize: 21.5,
                     fontWeight: FontWeight.w800,
                     color: Color(0xFF161A1D),
                   ),
@@ -100,10 +115,16 @@ class _AttendantChatScreenState extends State<AttendantChatScreen> {
                     controller: _viewModel.searchController,
                     decoration: const InputDecoration(
                       border: InputBorder.none,
-                      contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 16,
+                      ),
                       prefixIcon: Icon(Icons.search, color: Color(0xFF6E4B4B)),
                       hintText: 'Buscar paciente ou pedido...',
-                      hintStyle: TextStyle(color: Color(0xFF9A9A9A), fontSize: 16),
+                      hintStyle: TextStyle(
+                        color: Color(0xFF9A9A9A),
+                        fontSize: 16,
+                      ),
                     ),
                   ),
                 ),
@@ -121,7 +142,10 @@ class _AttendantChatScreenState extends State<AttendantChatScreen> {
                       padding: const EdgeInsets.only(bottom: 12),
                       child: _ChatClientCard(
                         client: client,
-                        isSelected: selectedClientId == client.id,
+                        isSelected: _viewModel.selectedClientId == client.id,
+                        onTap: () {
+                          _viewModel.selectClient(client.id);
+                        },
                       ),
                     ),
                   ),
@@ -169,95 +193,122 @@ class _AttendantChatScreenState extends State<AttendantChatScreen> {
 class _ChatClientCard extends StatelessWidget {
   final AttendantSearchClient client;
   final bool isSelected;
+  final VoidCallback onTap;
 
   const _ChatClientCard({
     required this.client,
     required this.isSelected,
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    final previewText = 'Olá, preciso de ajuda com meu pedido...';
+    const previewText = 'Olá, preciso de ajuda com meu pedido...';
 
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
         borderRadius: BorderRadius.circular(14),
-        border: Border(
-          left: BorderSide(
-            color: isSelected ? Pallete.primaryRed : Colors.transparent,
-            width: 4,
-          ),
-        ),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 58,
-            height: 58,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
-              color: const Color(0xFFE7E7E7),
+        child: Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: isSelected ? const Color(0xFFFFF5F5) : Colors.white,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: isSelected ? Pallete.primaryRed : Colors.transparent,
+              width: 1.5,
             ),
-            child: Center(
-              child: Text(
-                client.initials,
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w800,
-                  color: Color(0xFF2B2B2B),
-                ),
-              ),
-            ),
+            boxShadow: isSelected
+                ? const [
+                    BoxShadow(
+                      color: Color(0x14B80000),
+                      blurRadius: 14,
+                      offset: Offset(0, 6),
+                    ),
+                  ]
+                : null,
           ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  _formatName(client.name),
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w800,
-                    fontSize: 18,
-                    color: Color(0xFF111111),
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  previewText,
-                  style: const TextStyle(
-                    color: Color(0xFF4F3131),
-                    fontSize: 16,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 10),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
+          child: Row(
             children: [
-              Text(
-                _formatTimeLabel(client.timeLabel),
-                style: TextStyle(
-                  color: isSelected ? Pallete.primaryRed : const Color(0xFF6F5959),
-                  fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-                  fontSize: 14,
+              Container(
+                width: 58,
+                height: 58,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  color: isSelected
+                      ? const Color(0xFFF7DADA)
+                      : const Color(0xFFE7E7E7),
+                ),
+                child: Center(
+                  child: Text(
+                    client.initials,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF2B2B2B),
+                    ),
+                  ),
                 ),
               ),
-              const SizedBox(height: 16),
-              Icon(
-                isSelected ? Icons.circle : Icons.chevron_right,
-                size: isSelected ? 14 : 22,
-                color: isSelected ? Pallete.primaryRed : const Color(0xFF6F5959),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      _formatName(client.name),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 18,
+                        color: Color(0xFF111111),
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      previewText,
+                      style: TextStyle(
+                        color: isSelected
+                            ? Pallete.primaryRed
+                            : const Color(0xFF4F3131),
+                        fontSize: 16,
+                        fontWeight:
+                            isSelected ? FontWeight.w600 : FontWeight.w400,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 10),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    _formatTimeLabel(client.timeLabel),
+                    style: TextStyle(
+                      color: isSelected
+                          ? Pallete.primaryRed
+                          : const Color(0xFF6F5959),
+                      fontWeight:
+                          isSelected ? FontWeight.w800 : FontWeight.w600,
+                      fontSize: 14,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Icon(
+                    Icons.chevron_right,
+                    size: 22,
+                    color: isSelected
+                        ? Pallete.primaryRed
+                        : const Color(0xFF6F5959),
+                  ),
+                ],
               ),
             ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -265,9 +316,11 @@ class _ChatClientCard extends StatelessWidget {
   String _formatName(String upperName) {
     return upperName
         .split(' ')
-        .map((part) => part.isEmpty
-            ? part
-            : part[0].toUpperCase() + part.substring(1).toLowerCase())
+        .map(
+          (part) => part.isEmpty
+              ? part
+              : part[0].toUpperCase() + part.substring(1).toLowerCase(),
+        )
         .join(' ');
   }
 
