@@ -18,6 +18,7 @@ import 'package:farmacia_app/features/client/notifications/view/notifications_sc
 import 'package:farmacia_app/features/client/purchase_history/view/purchase_history_screen.dart';
 import 'package:farmacia_app/features/client/account/view/personal_data_screen.dart';
 import 'package:farmacia_app/features/client/account/view/favorite_products_screen.dart';
+import 'package:farmacia_app/features/client/account/view/payment_methods_screen.dart';
 
 // ── Rotas do Gerente ───────────────────────────────────────────────────────────
 import 'package:farmacia_app/features/manager/manager_shell_screen.dart';
@@ -46,6 +47,7 @@ class AppRoutes {
   static const String purchaseHistory = '/purchase_history';
   static const String personalData = '/personal_data';
   static const String favorites = '/favorites';
+  static const String paymentMethods = '/payment_methods';
 
   static Map<String, WidgetBuilder> get routes => {
         splash: (_) => SplashScreen(),
@@ -65,5 +67,6 @@ class AppRoutes {
         homeManager: (_) => ManagerShellScreen(),
         personalData: (_) => PersonalDataScreen(),
         favorites: (_) => FavoriteProductsScreen(),
+        paymentMethods: (_) => PaymentMethodsScreen(),
       };
 }
