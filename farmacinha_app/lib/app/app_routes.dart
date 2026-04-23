@@ -26,6 +26,8 @@ import 'package:farmacia_app/features/client/account/view/payment_methods_screen
 import 'package:farmacia_app/features/client/search/view/search_result_view.dart';
 import 'package:farmacia_app/features/client/product_detail/view/product_detail_view.dart';
 // Import necessário para o Cast do argumento
+// ignore: unused_import
+import 'package:farmacia_app/features/client/home_client/data/models/product_model.dart'; // Import necessário para o Cast do argumento
 
 // ── Rotas do Gerente ───────────────────────────────────────────────────────────
 import 'package:farmacia_app/features/manager/manager_shell_screen.dart';

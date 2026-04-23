@@ -84,8 +84,7 @@ class SearchResultScreen extends StatelessWidget {
                             arguments: product,
                           );
                         },
-                        onAddToCart: () =>
-                            debugPrint("${product.name} adicionado"),
+                        onAddToCart: () => viewModel.addToCart(context, product),
                       );
                     },
                   ),
@@ -128,7 +127,8 @@ class SearchResultScreen extends StatelessWidget {
                                   arguments: product,
                                 );
                               },
-                              onAddToCart: () {},
+                              onAddToCart: () =>
+                                  viewModel.addToCart(context, product),
                             ),
                           );
                         },

@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:farmacia_app/features/auth/view_models/auth_session_view_model.dart';
 import 'package:farmacia_app/features/client/home_client/data/models/product_model.dart';
 import 'package:farmacia_app/features/client/home_client/data/mocks/mock_products.dart';
 
 class SearchResultViewModel extends ChangeNotifier {
+  final AuthSessionViewModel _authSession;
   List<Product> filteredProducts = [];
   List<Product> similarProducts = [];
   String searchQuery = "";
   bool isLoading = false;
 
   // Construtor com inicialização automática 
-  SearchResultViewModel({String? initialQuery}) {
+  SearchResultViewModel({
+    String? initialQuery,
+    AuthSessionViewModel? authSession,
+  }) : _authSession = authSession ?? AuthSessionViewModel.instance {
     if (initialQuery != null && initialQuery.isNotEmpty) {
       search(initialQuery);
     }
@@ -46,5 +51,15 @@ class SearchResultViewModel extends ChangeNotifier {
     isLoading = false;
     notifyListeners();
   }
-}
 
+  void addToCart(BuildContext context, Product product) {
+    if (!_authSession.requireAuthentication(
+      context,
+      message: 'Entre com sua conta para adicionar produtos ao carrinho.',
+    )) {
+      return;
+    }
+
+    debugPrint("${product.name} adicionado");
+  }
+}

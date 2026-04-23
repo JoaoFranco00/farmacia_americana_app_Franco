@@ -100,7 +100,7 @@ class ProductDetailScreen extends StatelessWidget {
                             elevation: 0,
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                           ),
-                          onPressed: () => viewModel.addToCart(),
+                          onPressed: () => viewModel.addToCart(context),
                           child: const Text(
                             "Adicionar ao Carrinho", 
                             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)
@@ -117,10 +117,7 @@ class ProductDetailScreen extends StatelessWidget {
                             elevation: 0,
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                           ),
-                          onPressed: () {
-                            // Chamar método da ViewModel para compra direta
-                            debugPrint("Comprando: ${product.name}");
-                          },
+                          onPressed: () => viewModel.buyNow(context),
                           child: const Text(
                             "Comprar Agora", 
                             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)
