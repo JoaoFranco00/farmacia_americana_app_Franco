@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:farmacia_app/core/palette/pallete.dart';
+import 'package:farmacia_app/features/client/account/view/addresses_screen.dart';
 import 'package:farmacia_app/features/client/account/view/payment_methods_screen.dart';
 import 'package:farmacia_app/features/client/account/view_model/account_view_model.dart';
 import 'package:farmacia_app/features/client/orders/list/view/orders_screen.dart';
@@ -352,7 +353,11 @@ class _AccountScreenState extends State<AccountScreen> {
                 iconColor: const Color(0xFF005F93),
                 title: 'Endereços',
                 subtitle: 'Gerencie seus locais de entrega',
-                onTap: () => debugPrint('Endereços'),
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const AddressesScreen()),
+                  );
+                },
               ),
             ),
           ],
