@@ -26,12 +26,12 @@ class AttendantSupportScreen extends StatelessWidget {
           ),
         ),
       ),
-      body: SafeArea(
+      body: const SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(16, 10, 16, 28),
+          padding: EdgeInsets.fromLTRB(16, 10, 16, 28),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
+            children: [
               _SupportHero(),
               SizedBox(height: 28),
               _SupportCard(
@@ -108,7 +108,7 @@ class _SupportHero extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 18),
-        Text(
+        const Text(
           'Precisa de aux\u00edlio t\u00e9cnico? Entre em contato com nossa equipe de suporte dedicada. Estamos prontos para garantir a continuidade operacional da sua unidade.',
           style: TextStyle(
             color: Color(0xFF7A5D5A),

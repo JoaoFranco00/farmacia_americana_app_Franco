@@ -27,6 +27,7 @@ class SearchResultScreen extends StatelessWidget {
           onMenuTap: () => Navigator.pop(context),
           onNotificationTap: () =>
               Navigator.pushNamed(context, AppRoutes.notifications),
+          showBackButton: true,
         ),
         body: Consumer<SearchResultViewModel>(
           builder: (context, viewModel, child) {
@@ -144,6 +145,7 @@ class SearchResultScreen extends StatelessWidget {
           currentIndex: 0,
           onTap: (index) {
             if (index == 0) Navigator.pushNamed(context, AppRoutes.homeClient);
+            if (index == 2) Navigator.pushNamed(context, AppRoutes.cart);
           },
         ),
       ),

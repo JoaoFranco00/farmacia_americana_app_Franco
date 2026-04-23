@@ -383,6 +383,11 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
       return;
     }
 
+    if (index == 2) {
+      Navigator.of(context).pushNamed(AppRoutes.cart);
+      return;
+    }
+
     _showInfo(viewModel.unavailableScreenMessage);
   }
 

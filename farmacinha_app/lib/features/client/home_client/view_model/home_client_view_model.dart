@@ -3,6 +3,7 @@ import 'package:farmacia_app/features/client/home_client/data/mocks/mock_product
 import 'package:farmacia_app/features/client/home_client/data/mocks/mock_categories.dart';
 import 'package:farmacia_app/features/client/home_client/data/models/banner_model.dart';
 import 'package:farmacia_app/features/client/home_client/data/mocks/mock_banners.dart';
+import 'package:farmacia_app/features/client/cart/view_model/cart_view_model.dart';
 import 'package:farmacia_app/features/client/home_client/data/models/product_model.dart';
 import 'package:farmacia_app/features/client/home_client/data/models/category_model.dart';
 import 'package:farmacia_app/features/auth/view_models/auth_session_view_model.dart';
@@ -110,8 +111,12 @@ class HomeClientViewModel extends ChangeNotifier {
       return;
     }
 
-    // Aqui você conectará futuramente com a sua CartViewModel ou Service
-    debugPrint('Adicionado ao carrinho: ${product.name}');
+    CartViewModel.instance.addProduct(product);
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(content: Text('${product.name} adicionado ao carrinho.')),
+      );
   }
 
   bool requestProtectedAction(BuildContext context, String message) {

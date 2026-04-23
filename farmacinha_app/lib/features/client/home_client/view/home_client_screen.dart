@@ -46,12 +46,10 @@ class _HomeClientScreenState extends State<HomeClientScreen> {
           context,
           'Entre com sua conta para acessar seu carrinho.',
         )) {
-          setState(() => _currentTabIndex = index);
-          debugPrint('Abrir Carrinho');
+          Navigator.of(context).pushNamed(AppRoutes.cart);
         }
         break;
       case 3:
-        setState(() => _currentTabIndex = index);
         Navigator.of(context).push(MaterialPageRoute(builder: (_) => const AccountScreen()));
         break;
       default:

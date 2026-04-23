@@ -34,6 +34,11 @@ class _FavoriteProductsScreenState extends State<FavoriteProductsScreen> {
       return;
     }
 
+    if (index == 2) {
+      Navigator.of(context).pushNamed(AppRoutes.cart);
+      return;
+    }
+
     if (index == 3) {
       return;
     }
@@ -100,7 +105,7 @@ class _FavoriteProductsScreenState extends State<FavoriteProductsScreen> {
             icon: const Icon(Icons.search_rounded, color: Color(0xFFB90014)),
           ),
           IconButton(
-            onPressed: () => debugPrint('Abrir carrinho'),
+            onPressed: () => Navigator.of(context).pushNamed(AppRoutes.cart),
             icon: const Icon(
               Icons.shopping_cart_rounded,
               color: Color(0xFFB90014),

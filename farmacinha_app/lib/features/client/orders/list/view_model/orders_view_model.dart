@@ -1,36 +1,38 @@
-import 'package:flutter/material.dart';
 import 'package:farmacia_app/features/client/orders/data/models/order_model.dart';
-import 'package:farmacia_app/features/client/orders/data/mocks/mock_orders.dart';
+import 'package:farmacia_app/features/client/orders/view_model/orders_store.dart';
+import 'package:flutter/material.dart';
 
 class OrdersViewModel extends ChangeNotifier {
+  OrdersViewModel({OrdersStore? ordersStore})
+      : _ordersStore = ordersStore ?? OrdersStore.instance {
+    _ordersStore.addListener(_handleOrdersChanged);
+    _loadOrders();
+  }
+
+  final OrdersStore _ordersStore;
   List<Order> _allOrders = [];
   List<Order> _filteredOrders = [];
   bool _isLoading = false;
   String? _errorMessage;
-  int _selectedFilterIndex = 0; // 0=Todos, 1=Ativos, 2=Entregues, 3=Cancelados
+  int _selectedFilterIndex = 0;
 
   List<Order> get filteredOrders => _filteredOrders;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
   int get selectedFilterIndex => _selectedFilterIndex;
 
-  final List<String> filterLabels = [
+  final List<String> filterLabels = const [
     'Todos',
     'Ativos',
     'Entregues',
     'Cancelados',
   ];
 
-  OrdersViewModel() {
-    _loadOrders();
-  }
-
   void _loadOrders() {
     _setLoading(true);
-    Future.delayed(const Duration(milliseconds: 600), () {
+    Future.delayed(const Duration(milliseconds: 350), () {
       try {
-        _allOrders = MockOrders.getOrders();
-        _allOrders.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+        _allOrders = _ordersStore.orders;
         _applyFilter();
         _setLoading(false);
       } catch (e) {
@@ -38,6 +40,11 @@ class OrdersViewModel extends ChangeNotifier {
         _setLoading(false);
       }
     });
+  }
+
+  void _handleOrdersChanged() {
+    _allOrders = _ordersStore.orders;
+    _applyFilter();
   }
 
   void selectFilter(int index) {
@@ -48,23 +55,20 @@ class OrdersViewModel extends ChangeNotifier {
   void _applyFilter() {
     switch (_selectedFilterIndex) {
       case 1:
-        _filteredOrders =
-            _allOrders.where((o) => o.status.isActive).toList();
+        _filteredOrders = _allOrders.where((order) => order.status.isActive).toList();
         break;
       case 2:
-        _filteredOrders =
-            _allOrders
-                .where((o) => o.status == OrderStatus.delivered)
-                .toList();
+        _filteredOrders = _allOrders
+            .where((order) => order.status == OrderStatus.delivered)
+            .toList();
         break;
       case 3:
-        _filteredOrders =
-            _allOrders
-                .where((o) => o.status == OrderStatus.cancelled)
-                .toList();
+        _filteredOrders = _allOrders
+            .where((order) => order.status == OrderStatus.cancelled)
+            .toList();
         break;
       default:
-        _filteredOrders = List.from(_allOrders);
+        _filteredOrders = List<Order>.from(_allOrders);
     }
     notifyListeners();
   }
@@ -72,5 +76,11 @@ class OrdersViewModel extends ChangeNotifier {
   void _setLoading(bool value) {
     _isLoading = value;
     notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _ordersStore.removeListener(_handleOrdersChanged);
+    super.dispose();
   }
 }

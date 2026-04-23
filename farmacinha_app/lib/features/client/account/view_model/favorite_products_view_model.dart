@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:collection';
 
+import 'package:farmacia_app/features/client/cart/view_model/cart_view_model.dart';
 import 'package:flutter/material.dart';
 
 class FavoriteProductsViewModel extends ChangeNotifier {
@@ -34,6 +35,14 @@ class FavoriteProductsViewModel extends ChangeNotifier {
   }
 
   String addToCart(FavoriteProduct product) {
+    CartViewModel.instance.addCustomItem(
+      productId: product.id,
+      name: product.title,
+      subtitle: product.category,
+      imageUrl: product.imageUrl,
+      unitPrice: _parsePrice(product.price),
+    );
+
     if (_loadingAddToCart.add(product.id)) {
       _notifySafely();
       unawaited(_finishAddToCart(product.id));
@@ -58,6 +67,15 @@ class FavoriteProductsViewModel extends ChangeNotifier {
   void dispose() {
     _isDisposed = true;
     super.dispose();
+  }
+
+  double _parsePrice(String rawPrice) {
+    final normalized = rawPrice
+        .replaceAll('R\$', '')
+        .replaceAll(' ', '')
+        .replaceAll('.', '')
+        .replaceAll(',', '.');
+    return double.tryParse(normalized) ?? 0;
   }
 }
 

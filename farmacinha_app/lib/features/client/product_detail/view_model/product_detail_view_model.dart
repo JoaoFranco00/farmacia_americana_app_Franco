@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:farmacia_app/app/app_routes.dart';
 import 'package:farmacia_app/features/auth/view_models/auth_session_view_model.dart';
+import 'package:farmacia_app/features/client/cart/view_model/cart_view_model.dart';
 import 'package:farmacia_app/features/client/home_client/data/models/product_model.dart';
 
 class ProductDetailViewModel extends ChangeNotifier {
@@ -30,11 +32,21 @@ class ProductDetailViewModel extends ChangeNotifier {
 
     // Simula uma pequena espera (delay) como se estivesse enviando para uma API
     await Future.delayed(const Duration(milliseconds: 500));
-    
-    debugPrint('Produto ${product.name} enviado para o carrinho!');
-    
+
+    CartViewModel.instance.addProduct(product);
+
     _isAdding = false;
     notifyListeners();
+
+    if (!context.mounted) {
+      return;
+    }
+
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(content: Text('${product.name} adicionado ao carrinho.')),
+      );
   }
 
   void buyNow(BuildContext context) {
@@ -45,6 +57,7 @@ class ProductDetailViewModel extends ChangeNotifier {
       return;
     }
 
-    debugPrint("Comprando: ${product.name}");
+    CartViewModel.instance.addProduct(product);
+    Navigator.of(context).pushNamed(AppRoutes.cart);
   }
 }

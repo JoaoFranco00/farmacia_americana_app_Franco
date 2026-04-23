@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:farmacia_app/features/auth/view_models/auth_session_view_model.dart';
+import 'package:farmacia_app/features/client/cart/view_model/cart_view_model.dart';
 import 'package:farmacia_app/features/client/home_client/data/models/product_model.dart';
 import 'package:farmacia_app/features/client/home_client/data/mocks/mock_products.dart';
 
@@ -60,6 +61,11 @@ class SearchResultViewModel extends ChangeNotifier {
       return;
     }
 
-    debugPrint("${product.name} adicionado");
+    CartViewModel.instance.addProduct(product);
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(content: Text('${product.name} adicionado ao carrinho.')),
+      );
   }
 }

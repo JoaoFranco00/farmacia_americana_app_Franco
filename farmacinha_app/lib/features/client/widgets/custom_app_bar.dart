@@ -6,6 +6,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback onNotificationTap;
   final VoidCallback? onLogoTap;
   final int unreadCount;
+  final bool showBackButton;
 
   const CustomAppBar({
     super.key,
@@ -13,6 +14,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     required this.onNotificationTap,
     this.onLogoTap,
     this.unreadCount = 0,
+    this.showBackButton = false,
   });
 
   @override
@@ -21,10 +23,10 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       elevation: 1,
       backgroundColor: Pallete.whiteColor,
       leading: IconButton(
-        icon: const Icon(
-          Icons.menu_rounded,
+        icon: Icon(
+          showBackButton ? Icons.arrow_back_ios_new_rounded : Icons.menu_rounded,
           color: Pallete.primaryRed,
-          size: 28,
+          size: showBackButton ? 24 : 28,
         ),
         onPressed: onMenuTap,
       ),

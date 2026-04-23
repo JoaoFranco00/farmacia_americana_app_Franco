@@ -37,9 +37,9 @@ extension PaymentMethodExtension on PaymentMethod {
       case PaymentMethod.pix:
         return 'Pix';
       case PaymentMethod.cashOnDelivery:
-        return 'Dinheiro na entrega';
+        return 'Dinheiro';
       case PaymentMethod.cardOnDelivery:
-        return 'Cartão na entrega';
+        return 'Cartão de Crédito';
     }
   }
 }

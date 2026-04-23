@@ -51,7 +51,7 @@ class CustomBottomNavBar extends StatelessWidget {
         BottomNavigationBarItem(
           icon: Icon(Icons.home_outlined),    // Ícone de linha (vazado) para estado inativo
           activeIcon: Icon(Icons.home_rounded), // Ícone preenchido para estado ativo
-          label: 'Home',
+          label: 'Início',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.chat_bubble_outline_rounded),
