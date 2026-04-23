@@ -1,36 +1,28 @@
 import 'package:farmacia_app/features/client/chat/data/models/client_chat_message_model.dart';
 
 class ClientChatConversation {
-  final String attendantName;
-  final String attendantRole;
+  final String pharmacyName;
   final String statusLabel;
-  final String orderCode;
-  final bool isAttendantTyping;
+  final bool isSupportTyping;
   final List<ClientChatMessage> messages;
 
   const ClientChatConversation({
-    required this.attendantName,
-    required this.attendantRole,
+    required this.pharmacyName,
     required this.statusLabel,
-    required this.orderCode,
     required this.messages,
-    this.isAttendantTyping = false,
+    this.isSupportTyping = false,
   });
 
   ClientChatConversation copyWith({
-    String? attendantName,
-    String? attendantRole,
+    String? pharmacyName,
     String? statusLabel,
-    String? orderCode,
-    bool? isAttendantTyping,
+    bool? isSupportTyping,
     List<ClientChatMessage>? messages,
   }) {
     return ClientChatConversation(
-      attendantName: attendantName ?? this.attendantName,
-      attendantRole: attendantRole ?? this.attendantRole,
+      pharmacyName: pharmacyName ?? this.pharmacyName,
       statusLabel: statusLabel ?? this.statusLabel,
-      orderCode: orderCode ?? this.orderCode,
-      isAttendantTyping: isAttendantTyping ?? this.isAttendantTyping,
+      isSupportTyping: isSupportTyping ?? this.isSupportTyping,
       messages: messages ?? this.messages,
     );
   }

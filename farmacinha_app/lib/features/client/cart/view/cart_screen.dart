@@ -2,6 +2,7 @@ import 'package:farmacia_app/core/palette/pallete.dart';
 import 'package:farmacia_app/features/client/account/view/account_screen.dart';
 import 'package:farmacia_app/features/client/cart/view/checkout_screen.dart';
 import 'package:farmacia_app/features/client/cart/view_model/cart_view_model.dart';
+import 'package:farmacia_app/features/client/chat/view/client_chat_screen.dart';
 import 'package:farmacia_app/features/client/widgets/custom_bottom_nav_bar.dart';
 import 'package:farmacia_app/features/client/home_client/view/home_client_screen.dart';
 import 'package:flutter/material.dart';
@@ -426,7 +427,14 @@ class _CartScreenState extends State<CartScreen> {
       return;
     }
 
-    if (index == 1 || index == 2) {
+    if (index == 1) {
+      Navigator.of(context).push(
+        MaterialPageRoute(builder: (_) => const ClientChatScreen()),
+      );
+      return;
+    }
+
+    if (index == 2) {
       return;
     }
 

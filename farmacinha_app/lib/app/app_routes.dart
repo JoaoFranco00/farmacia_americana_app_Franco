@@ -26,6 +26,7 @@ import 'package:farmacia_app/features/client/account/view/payment_methods_screen
 import 'package:farmacia_app/features/client/account/view/addresses_screen.dart';
 import 'package:farmacia_app/features/client/cart/view/cart_screen.dart';
 import 'package:farmacia_app/features/client/cart/view/checkout_screen.dart';
+import 'package:farmacia_app/features/client/chat/view/client_chat_screen.dart';
 import 'package:farmacia_app/features/client/search/view/search_result_view.dart';
 import 'package:farmacia_app/features/client/product_detail/view/product_detail_view.dart';
 // Import necessário para o Cast do argumento
@@ -66,6 +67,7 @@ class AppRoutes {
   static const String addresses = '/addresses';
   static const String cart = '/cart';
   static const String checkout = '/checkout';
+  static const String clientChat = '/client_chat';
   static const String searchResult = '/search_result';
   static const String productDetail = '/product_detail';
 
@@ -95,6 +97,7 @@ class AppRoutes {
     addresses: (_) => AddressesScreen(),
     cart: (_) => CartScreen(),
     checkout: (_) => CheckoutScreen(),
+    clientChat: (_) => ClientChatScreen(),
     searchResult: (_) => SearchResultScreen(),
     productDetail: (_) => ProductDetailScreen(),
   };

@@ -3,6 +3,7 @@ import 'package:farmacia_app/core/palette/pallete.dart';
 import 'package:farmacia_app/features/client/account/view/account_screen.dart';
 import 'package:farmacia_app/features/client/chat/data/models/client_chat_attachment_model.dart';
 import 'package:farmacia_app/features/client/chat/data/models/client_chat_message_model.dart';
+import 'package:farmacia_app/features/client/chat/data/models/client_chat_option_model.dart';
 import 'package:farmacia_app/features/client/chat/view_model/client_chat_view_model.dart';
 import 'package:farmacia_app/features/client/home_client/view/home_client_screen.dart';
 import 'package:farmacia_app/features/client/widgets/custom_bottom_nav_bar.dart';
@@ -50,7 +51,15 @@ class _ClientChatScreenState extends State<ClientChatScreen> {
 
             return Row(
               children: [
-                const _SupportAvatar(),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(14),
+                  child: Image.asset(
+                    'assets/images/logo_pequena.png',
+                    width: 42,
+                    height: 42,
+                    fit: BoxFit.cover,
+                  ),
+                ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
@@ -58,7 +67,7 @@ class _ClientChatScreenState extends State<ClientChatScreen> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        conversation.attendantName,
+                        conversation.pharmacyName,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
@@ -69,7 +78,7 @@ class _ClientChatScreenState extends State<ClientChatScreen> {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        '${conversation.statusLabel} • Pedido ${conversation.orderCode}',
+                        conversation.statusLabel,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
@@ -102,24 +111,13 @@ class _ClientChatScreenState extends State<ClientChatScreen> {
                   borderRadius: BorderRadius.circular(22),
                   border: Border.all(color: const Color(0xFFFFD7D1)),
                 ),
-                child: Row(
+                child: const Row(
                   children: [
-                    Container(
-                      width: 42,
-                      height: 42,
-                      decoration: BoxDecoration(
-                        color: Pallete.accentYellow.withOpacity(0.28),
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      child: const Icon(
-                        Icons.attach_file_rounded,
-                        color: Color(0xFF6E5C00),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    const Expanded(
+                    _TopInfoIcon(),
+                    SizedBox(width: 12),
+                    Expanded(
                       child: Text(
-                        'Envie fotos da receita ou documentos para agilizar seu atendimento.',
+                        'O atendimento comeca pelo ChatBot com opcoes clicaveis. Quando necessario, a conversa e encaminhada para uma pessoa do time.',
                         style: TextStyle(
                           color: Color(0xFF5D3F3C),
                           fontSize: 13.5,
@@ -150,9 +148,15 @@ class _ClientChatScreenState extends State<ClientChatScreen> {
                       const Center(child: _DayPill(label: 'Atendimento de hoje')),
                       const SizedBox(height: 22),
                       ...conversation.messages.map(
-                        (message) => _MessageBubble(message: message),
+                        (message) => _MessageBubble(
+                          message: message,
+                          isOptionsEnabled: _viewModel.isOptionsEnabledFor(
+                            message.id,
+                          ),
+                          onOptionSelected: _viewModel.selectOption,
+                        ),
                       ),
-                      if (conversation.isAttendantTyping) ...[
+                      if (conversation.isSupportTyping) ...[
                         const SizedBox(height: 6),
                         const _TypingIndicator(),
                       ],
@@ -162,6 +166,7 @@ class _ClientChatScreenState extends State<ClientChatScreen> {
               ),
               _ChatComposer(
                 controller: _viewModel.messageController,
+                isEnabled: _viewModel.canSendFreeText,
                 onAttach: _showAttachmentOptions,
                 onSend: _viewModel.sendMessage,
               ),
@@ -176,8 +181,8 @@ class _ClientChatScreenState extends State<ClientChatScreen> {
     );
   }
 
-  void _showAttachmentOptions() {
-    showModalBottomSheet<void>(
+  Future<void> _showAttachmentOptions() async {
+    await showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
@@ -200,7 +205,7 @@ class _ClientChatScreenState extends State<ClientChatScreen> {
                 ),
                 const SizedBox(height: 8),
                 const Text(
-                  'Escolha o tipo de anexo que deseja enviar para o atendimento.',
+                  'Escolha se deseja enviar uma imagem da galeria ou um documento compativel.',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Pallete.textColor,
@@ -210,14 +215,18 @@ class _ClientChatScreenState extends State<ClientChatScreen> {
                 ),
                 const SizedBox(height: 18),
                 _AttachmentOptionTile(
-                  icon: Icons.photo_camera_back_rounded,
+                  icon: Icons.photo_library_rounded,
                   iconColor: const Color(0xFF005F93),
                   iconBackgroundColor: const Color(0xFFCDE5FF),
-                  title: 'Foto',
-                  subtitle: 'Receita, embalagem ou imagem do produto',
-                  onTap: () {
+                  title: 'Anexar imagem',
+                  subtitle: 'Seleciona apenas fotos ou imagens da galeria',
+                  onTap: () async {
                     Navigator.of(sheetContext).pop();
-                    _viewModel.attachMedia(ClientAttachmentType.photo);
+                    final message = await _viewModel.attachFile(
+                      ClientAttachmentType.photo,
+                    );
+                    if (!mounted || message == null) return;
+                    _showSnack(message);
                   },
                 ),
                 const SizedBox(height: 12),
@@ -225,11 +234,15 @@ class _ClientChatScreenState extends State<ClientChatScreen> {
                   icon: Icons.description_rounded,
                   iconColor: Pallete.primaryRed,
                   iconBackgroundColor: const Color(0xFFFFE3DF),
-                  title: 'Documento',
-                  subtitle: 'PDF, laudo, prescricao ou comprovante',
-                  onTap: () {
+                  title: 'Anexar documento',
+                  subtitle: 'Aceita PDF, DOC, DOCX, TXT e RTF',
+                  onTap: () async {
                     Navigator.of(sheetContext).pop();
-                    _viewModel.attachMedia(ClientAttachmentType.document);
+                    final message = await _viewModel.attachFile(
+                      ClientAttachmentType.document,
+                    );
+                    if (!mounted || message == null) return;
+                    _showSnack(message);
                   },
                 ),
               ],
@@ -264,41 +277,29 @@ class _ClientChatScreenState extends State<ClientChatScreen> {
       );
     }
   }
+
+  void _showSnack(String message) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(message)));
+  }
 }
 
-class _SupportAvatar extends StatelessWidget {
-  const _SupportAvatar();
+class _TopInfoIcon extends StatelessWidget {
+  const _TopInfoIcon();
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Container(
-          width: 44,
-          height: 44,
-          decoration: BoxDecoration(
-            color: const Color(0xFFFFE3DF),
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: const Icon(
-            Icons.support_agent_rounded,
-            color: Pallete.primaryRed,
-          ),
-        ),
-        Positioned(
-          right: 2,
-          bottom: 2,
-          child: Container(
-            width: 10,
-            height: 10,
-            decoration: BoxDecoration(
-              color: const Color(0xFF41C86A),
-              shape: BoxShape.circle,
-              border: Border.all(color: Colors.white, width: 1.8),
-            ),
-          ),
-        ),
-      ],
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: Color(0xFFFFD33D),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: SizedBox(
+        width: 42,
+        height: 42,
+        child: Icon(Icons.smart_toy_rounded, color: Color(0xFF6E5C00)),
+      ),
     );
   }
 }
@@ -331,12 +332,27 @@ class _DayPill extends StatelessWidget {
 
 class _MessageBubble extends StatelessWidget {
   final ClientChatMessage message;
+  final bool isOptionsEnabled;
+  final ValueChanged<ClientChatOption> onOptionSelected;
 
-  const _MessageBubble({required this.message});
+  const _MessageBubble({
+    required this.message,
+    required this.isOptionsEnabled,
+    required this.onOptionSelected,
+  });
 
   @override
   Widget build(BuildContext context) {
     final isFromClient = message.isFromClient;
+    final isFromAttendant = message.isFromAttendant;
+
+    final bubbleColor = isFromClient
+        ? Pallete.primaryRed
+        : isFromAttendant
+        ? const Color(0xFFFFE8E4)
+        : Colors.white;
+
+    final textColor = isFromClient ? Colors.white : const Color(0xFF3A2A27);
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
@@ -345,16 +361,29 @@ class _MessageBubble extends StatelessWidget {
             ? CrossAxisAlignment.end
             : CrossAxisAlignment.start,
         children: [
+          if (isFromAttendant) ...[
+            const Padding(
+              padding: EdgeInsets.only(left: 4, bottom: 6),
+              child: Text(
+                'Atendimento humano',
+                style: TextStyle(
+                  color: Pallete.primaryRed,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ],
           Align(
             alignment: isFromClient
                 ? Alignment.centerRight
                 : Alignment.centerLeft,
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 295),
+              constraints: const BoxConstraints(maxWidth: 310),
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 decoration: BoxDecoration(
-                  color: isFromClient ? Pallete.primaryRed : Colors.white,
+                  color: bubbleColor,
                   borderRadius: BorderRadius.only(
                     topLeft: const Radius.circular(18),
                     topRight: const Radius.circular(18),
@@ -369,17 +398,39 @@ class _MessageBubble extends StatelessWidget {
                     ),
                   ],
                 ),
-                child: message.hasAttachment
-                    ? _AttachmentPreview(message: message)
-                    : Text(
-                        message.text ?? '',
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (message.hasAttachment)
+                      _AttachmentPreview(message: message)
+                    else if ((message.text ?? '').isNotEmpty)
+                      Text(
+                        message.text!,
                         style: TextStyle(
-                          color: isFromClient ? Colors.white : const Color(0xFF3A2A27),
+                          color: textColor,
                           fontSize: 15.5,
                           height: 1.45,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
+                    if (message.hasOptions) ...[
+                      const SizedBox(height: 14),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: message.options
+                            .map(
+                              (option) => _OptionChip(
+                                option: option,
+                                enabled: isOptionsEnabled,
+                                onTap: () => onOptionSelected(option),
+                              ),
+                            )
+                            .toList(),
+                      ),
+                    ],
+                  ],
+                ),
               ),
             ),
           ),
@@ -411,6 +462,44 @@ class _MessageBubble extends StatelessWidget {
   }
 }
 
+class _OptionChip extends StatelessWidget {
+  final ClientChatOption option;
+  final bool enabled;
+  final VoidCallback onTap;
+
+  const _OptionChip({
+    required this.option,
+    required this.enabled,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: enabled ? onTap : null,
+      borderRadius: BorderRadius.circular(999),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: BoxDecoration(
+          color: enabled ? const Color(0xFFFFF0EE) : const Color(0xFFF2F2F2),
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(
+            color: enabled ? const Color(0xFFFFD0C8) : const Color(0xFFE2E2E2),
+          ),
+        ),
+        child: Text(
+          option.label,
+          style: TextStyle(
+            color: enabled ? Pallete.primaryRed : const Color(0xFF8E8E8E),
+            fontSize: 13,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _AttachmentPreview extends StatelessWidget {
   final ClientChatMessage message;
 
@@ -421,76 +510,63 @@ class _AttachmentPreview extends StatelessWidget {
     final attachment = message.attachment!;
     final isPhoto = attachment.type == ClientAttachmentType.photo;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: isPhoto ? const Color(0x33FFFFFF) : const Color(0xFFF8ECEA),
-            borderRadius: BorderRadius.circular(14),
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: message.isFromClient
+            ? const Color(0x33FFFFFF)
+            : const Color(0xFFFFF3F1),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: message.isFromClient
+                  ? Colors.white.withOpacity(0.16)
+                  : const Color(0xFFFFE3DF),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(
+              isPhoto ? Icons.photo_library_rounded : Icons.picture_as_pdf_rounded,
+              color: message.isFromClient ? Colors.white : Pallete.primaryRed,
+            ),
           ),
-          child: Row(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: isPhoto
-                      ? Colors.white.withOpacity(0.16)
-                      : const Color(0xFFFFE3DF),
-                  borderRadius: BorderRadius.circular(12),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  attachment.fileName,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: message.isFromClient
+                        ? Colors.white
+                        : const Color(0xFF4A4A4A),
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
-                child: Icon(
-                  isPhoto ? Icons.photo_library_rounded : Icons.picture_as_pdf_rounded,
-                  color: isPhoto ? Colors.white : Pallete.primaryRed,
+                const SizedBox(height: 2),
+                Text(
+                  attachment.fileDetails,
+                  style: TextStyle(
+                    color: message.isFromClient
+                        ? Colors.white.withOpacity(0.82)
+                        : const Color(0xFF8B8B8B),
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      attachment.fileName,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: isPhoto ? Colors.white : const Color(0xFF4A4A4A),
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      attachment.fileDetails,
-                      style: TextStyle(
-                        color: isPhoto
-                            ? Colors.white.withOpacity(0.82)
-                            : const Color(0xFF8B8B8B),
-                        fontSize: 12.5,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-        if ((message.text ?? '').isNotEmpty) ...[
-          const SizedBox(height: 12),
-          Text(
-            message.text!,
-            style: TextStyle(
-              color: message.isFromClient ? Colors.white : const Color(0xFF3A2A27),
-              fontSize: 15.5,
-              height: 1.45,
-              fontWeight: FontWeight.w500,
+              ],
             ),
           ),
         ],
-      ],
+      ),
     );
   }
 }
@@ -503,7 +579,7 @@ class _TypingIndicator extends StatelessWidget {
     return const Padding(
       padding: EdgeInsets.only(left: 6),
       child: Text(
-        'Atendente digitando...',
+        'Atendimento digitando...',
         style: TextStyle(
           color: Color(0xFF9A887F),
           fontSize: 13,
@@ -517,11 +593,13 @@ class _TypingIndicator extends StatelessWidget {
 
 class _ChatComposer extends StatelessWidget {
   final TextEditingController controller;
+  final bool isEnabled;
   final VoidCallback onAttach;
   final VoidCallback onSend;
 
   const _ChatComposer({
     required this.controller,
+    required this.isEnabled,
     required this.onAttach,
     required this.onSend,
   });
@@ -548,7 +626,7 @@ class _ChatComposer extends StatelessWidget {
                   width: 52,
                   height: 52,
                   child: Icon(
-                    Icons.add_photo_alternate_outlined,
+                    Icons.attach_file_rounded,
                     color: Pallete.primaryRed,
                   ),
                 ),
@@ -572,11 +650,14 @@ class _ChatComposer extends StatelessWidget {
                 ),
                 child: TextField(
                   controller: controller,
+                  enabled: isEnabled,
                   textInputAction: TextInputAction.send,
-                  onSubmitted: (_) => onSend(),
-                  decoration: const InputDecoration(
-                    hintText: 'Escreva sua mensagem...',
-                    hintStyle: TextStyle(
+                  onSubmitted: (_) => isEnabled ? onSend() : null,
+                  decoration: InputDecoration(
+                    hintText: isEnabled
+                        ? 'Escreva sua mensagem...'
+                        : 'Escolha uma opcao no chat para continuar...',
+                    hintStyle: const TextStyle(
                       color: Color(0xFF9D9D9D),
                       fontWeight: FontWeight.w500,
                     ),
@@ -587,10 +668,10 @@ class _ChatComposer extends StatelessWidget {
             ),
             const SizedBox(width: 10),
             Material(
-              color: Pallete.primaryRed,
+              color: isEnabled ? Pallete.primaryRed : const Color(0xFFD8D8D8),
               borderRadius: BorderRadius.circular(16),
               child: InkWell(
-                onTap: onSend,
+                onTap: isEnabled ? onSend : null,
                 borderRadius: BorderRadius.circular(16),
                 child: const SizedBox(
                   width: 54,
@@ -616,7 +697,7 @@ class _AttachmentOptionTile extends StatelessWidget {
   final Color iconBackgroundColor;
   final String title;
   final String subtitle;
-  final VoidCallback onTap;
+  final Future<void> Function() onTap;
 
   const _AttachmentOptionTile({
     required this.icon,

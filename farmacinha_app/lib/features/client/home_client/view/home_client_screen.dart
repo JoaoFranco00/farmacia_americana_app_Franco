@@ -37,8 +37,7 @@ class _HomeClientScreenState extends State<HomeClientScreen> {
           context,
           'Entre com sua conta para iniciar um atendimento pelo chat.',
         )) {
-          setState(() => _currentTabIndex = index);
-          debugPrint('Abrir Chat');
+          Navigator.of(context).pushNamed(AppRoutes.clientChat);
         }
         break;
       case 2:
