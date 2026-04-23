@@ -1,0 +1,8 @@
+error: Your local changes to the following files would be overwritten by merge:
+        farmacinha_app/lib/features/manager/bi_manager/view/bi_manager_screen.dart
+        farmacinha_app/lib/features/manager/home_manager/view/home_manager_screen.dart
+        farmacinha_app/lib/features/manager/home_manager/view/widgets/best_sellers.dart
+        farmacinha_app/lib/features/manager/home_manager/view/widgets/recent_orders.dart
+        farmacinha_app/lib/features/manager/stock_manager/view/stock_manager_screen.dart
+Please commit your changes or stash them before you merge.
+Aborting

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:farmacia_app/core/palette/pallete.dart';
+import 'package:farmacia_app/features/manager/profile_manager/view/activity_history_screen.dart';
 
 class ActivityHistory extends StatelessWidget {
   final List<Map<String, String>> activities;
@@ -117,9 +118,7 @@ class ActivityHistory extends StatelessWidget {
 
           // Botão ver histórico completo
           OutlinedButton(
-            onPressed: () {
-              // Futuramente: navegar para tela de histórico completo
-            },
+            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ActivityHistoryScreen())),
             style: OutlinedButton.styleFrom(
               minimumSize: const Size(double.infinity, 40),
               side: BorderSide(color: Pallete.primaryRed.withOpacity(0.3)),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:farmacia_app/core/palette/pallete.dart';
+import 'package:farmacia_app/features/manager/home_manager/view/all_products_screen.dart';
 
 class BestSellers extends StatelessWidget {
   const BestSellers({super.key});
@@ -63,7 +64,7 @@ class BestSellers extends StatelessWidget {
 
           // Botão ver todos
           OutlinedButton(
-            onPressed: () {},
+            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AllProductsScreen())),
             style: OutlinedButton.styleFrom(
               minimumSize: const Size(double.infinity, 40),
               side: BorderSide(color: Pallete.primaryRed.withOpacity(0.3)),

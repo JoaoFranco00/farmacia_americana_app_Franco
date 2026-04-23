@@ -9,27 +9,30 @@ class ProfileManagerViewModel {
   String role = 'Gerente Geral';
   String email = 'joao@farmaciaamericana.com';
 
+  // Filial ativa — somente leitura
+  final String filial = 'Jacutinga — MG';
+
   // Histórico de atividades recentes
   final List<Map<String, String>> activityHistory = [
     {
       'title': 'Relatório gerado',
       'time': 'Hoje, 10:32',
-      'type': 'success', // verde
+      'type': 'success',
     },
     {
       'title': 'Estoque atualizado',
       'time': 'Hoje, 09:15',
-      'type': 'warning', // amarelo
+      'type': 'warning',
     },
     {
       'title': 'Pedido #CK-9279 cancelado',
       'time': 'Ontem, 17:48',
-      'type': 'error', // vermelho
+      'type': 'error',
     },
     {
       'title': 'Login realizado',
       'time': 'Ontem, 08:00',
-      'type': 'success', // verde
+      'type': 'success',
     },
   ];
 }
