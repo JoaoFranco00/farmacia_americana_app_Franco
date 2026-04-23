@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:farmacia_app/app/app_routes.dart';
 import 'package:farmacia_app/features/auth/data/mocks/mock_users.dart';
 import 'package:farmacia_app/features/auth/data/models/user_model.dart';
+import 'package:farmacia_app/features/auth/view_models/auth_session_view_model.dart';
+import 'package:provider/provider.dart';
 
 class LoginViewModel extends ChangeNotifier {
   // Controles dos campos de texto
@@ -58,6 +60,8 @@ class LoginViewModel extends ChangeNotifier {
     );
 
     try {
+      context.read<AuthSessionViewModel>().login(authenticatedUser);
+
       if (authenticatedUser.role == UserRole.cliente) {
         Navigator.pushNamedAndRemoveUntil(
           context,

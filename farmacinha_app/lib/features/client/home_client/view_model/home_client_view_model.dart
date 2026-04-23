@@ -5,8 +5,11 @@ import 'package:farmacia_app/features/client/home_client/data/models/banner_mode
 import 'package:farmacia_app/features/client/home_client/data/mocks/mock_banners.dart';
 import 'package:farmacia_app/features/client/home_client/data/models/product_model.dart';
 import 'package:farmacia_app/features/client/home_client/data/models/category_model.dart';
+import 'package:farmacia_app/features/auth/view_models/auth_session_view_model.dart';
 
 class HomeClientViewModel extends ChangeNotifier {
+  final AuthSessionViewModel _authSession;
+
   // ===== DADOS PRIVADOS =====
   List<Product> _allProducts = [];
   List<Product> _filteredProducts = [];
@@ -28,9 +31,11 @@ class HomeClientViewModel extends ChangeNotifier {
   String get searchQuery => _searchQuery;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
+  bool get isGuest => _authSession.isGuest || !_authSession.isAuthenticated;
 
   // ===== CONSTRUTOR =====
-  HomeClientViewModel() {
+  HomeClientViewModel({AuthSessionViewModel? authSession})
+      : _authSession = authSession ?? AuthSessionViewModel.instance {
     _initializeHome();
     searchController.addListener(_onSearchChanged);
   }
@@ -97,9 +102,20 @@ class HomeClientViewModel extends ChangeNotifier {
     _applyFilters();
   }
 
-  void addToCart(Product product) {
+  void addToCart(BuildContext context, Product product) {
+    if (!_authSession.requireAuthentication(
+      context,
+      message: 'Entre com sua conta para adicionar produtos ao carrinho.',
+    )) {
+      return;
+    }
+
     // Aqui você conectará futuramente com a sua CartViewModel ou Service
     debugPrint('Adicionado ao carrinho: ${product.name}');
+  }
+
+  bool requestProtectedAction(BuildContext context, String message) {
+    return _authSession.requireAuthentication(context, message: message);
   }
 
   // Este método pode ser usado para Analytics ou logs antes da navegação

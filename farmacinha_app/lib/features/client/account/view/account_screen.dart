@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:farmacia_app/core/palette/pallete.dart';
+import 'package:farmacia_app/features/client/account/view/addresses_screen.dart';
 import 'package:farmacia_app/features/client/account/view/payment_methods_screen.dart';
 import 'package:farmacia_app/features/client/account/view_model/account_view_model.dart';
 import 'package:farmacia_app/features/client/orders/list/view/orders_screen.dart';
@@ -56,18 +57,112 @@ class _AccountScreenState extends State<AccountScreen> {
 
           return SingleChildScrollView(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
-            child: Column(
-              children: [
-                _buildProfileHeader(),
-                const SizedBox(height: 20),
-                _buildMenuGrid(),
-                const SizedBox(height: 20),
-                _buildLoyaltyCard(),
-              ],
-            ),
+            child: viewModel.isGuest
+                ? _buildGuestAccess()
+                : Column(
+                    children: [
+                      _buildProfileHeader(),
+                      const SizedBox(height: 20),
+                      _buildMenuGrid(),
+                    ],
+                  ),
           );
         },
       ),
+    );
+  }
+
+  Widget _buildGuestAccess() {
+    return Column(
+      children: [
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.fromLTRB(22, 26, 22, 24),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.04),
+                blurRadius: 20,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          child: Column(
+            children: [
+              Container(
+                width: 78,
+                height: 78,
+                decoration: BoxDecoration(
+                  color: Pallete.primaryRed.withOpacity(0.08),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.person_outline_rounded,
+                  color: Pallete.primaryRed,
+                  size: 42,
+                ),
+              ),
+              const SizedBox(height: 18),
+              const Text(
+                'Você está como visitante',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w800,
+                  color: Color(0xFF291715),
+                ),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Faça login para acessar pedidos, dados pessoais, favoritos e formas de pagamento.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Pallete.textColor,
+                  height: 1.45,
+                ),
+              ),
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: () => viewModel.navigateToLogin(context),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Pallete.primaryRed,
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                  child: const Text(
+                    'Fazer login',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextButton(
+                onPressed: () => viewModel.navigateToRegister(context),
+                child: const Text(
+                  'Não tem conta? Cadastre-se',
+                  style: TextStyle(
+                    color: Pallete.primaryRed,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
@@ -258,7 +353,11 @@ class _AccountScreenState extends State<AccountScreen> {
                 iconColor: const Color(0xFF005F93),
                 title: 'Endereços',
                 subtitle: 'Gerencie seus locais de entrega',
-                onTap: () => debugPrint('Endereços'),
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const AddressesScreen()),
+                  );
+                },
               ),
             ),
           ],
@@ -294,60 +393,6 @@ class _AccountScreenState extends State<AccountScreen> {
           ],
         ),
       ],
-    );
-  }
-
-  // ─── CARD DE FIDELIDADE ─────────────────────────────────────────────────────
-
-  Widget _buildLoyaltyCard() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(22),
-      decoration: BoxDecoration(
-        color: Pallete.accentYellow,
-        borderRadius: BorderRadius.circular(24),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Clube de Benefícios',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w800,
-              color: Color(0xFF291715),
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            'Você tem ${viewModel.loyaltyPoints} pontos para trocar\npor descontos em medicamentos e higiene.',
-            style: const TextStyle(
-              fontSize: 13,
-              color: Color(0xFF291715),
-              height: 1.5,
-            ),
-          ),
-          const SizedBox(height: 16),
-          GestureDetector(
-            onTap: () => debugPrint('Ver Benefícios'),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 11),
-              decoration: BoxDecoration(
-                color: const Color(0xFF291715),
-                borderRadius: BorderRadius.circular(30),
-              ),
-              child: const Text(
-                'Ver Benefícios',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 13,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 

@@ -31,11 +31,31 @@ class _HomeClientScreenState extends State<HomeClientScreen> {
   }
 
   void _onTabTapped(int index) {
-    setState(() => _currentTabIndex = index);
     switch (index) {
+      case 1:
+        if (viewModel.requestProtectedAction(
+          context,
+          'Entre com sua conta para iniciar um atendimento pelo chat.',
+        )) {
+          setState(() => _currentTabIndex = index);
+          debugPrint('Abrir Chat');
+        }
+        break;
+      case 2:
+        if (viewModel.requestProtectedAction(
+          context,
+          'Entre com sua conta para acessar seu carrinho.',
+        )) {
+          setState(() => _currentTabIndex = index);
+          debugPrint('Abrir Carrinho');
+        }
+        break;
       case 3:
+        setState(() => _currentTabIndex = index);
         Navigator.of(context).push(MaterialPageRoute(builder: (_) => const AccountScreen()));
         break;
+      default:
+        setState(() => _currentTabIndex = index);
     }
   }
 
@@ -176,7 +196,7 @@ class _HomeClientScreenState extends State<HomeClientScreen> {
                 arguments: product,
               );
             },
-            onAddToCart: () => viewModel.addToCart(product),
+            onAddToCart: () => viewModel.addToCart(context, product),
           );
         },
       ),
