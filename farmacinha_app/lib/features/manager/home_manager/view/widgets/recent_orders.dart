@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:farmacia_app/core/palette/pallete.dart';
+import 'package:farmacia_app/features/manager/home_manager/view/orders_history_screen.dart';
 
 class RecentOrders extends StatefulWidget {
   const RecentOrders({super.key});
@@ -108,7 +109,7 @@ class _RecentOrdersState extends State<RecentOrders> {
 
           // Botão ver histórico
           InkWell(
-            onTap: () {},
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const OrdersHistoryScreen())),
             borderRadius: const BorderRadius.vertical(
               bottom: Radius.circular(16),
             ),

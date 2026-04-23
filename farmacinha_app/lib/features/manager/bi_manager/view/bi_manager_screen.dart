@@ -5,6 +5,9 @@ import 'package:farmacia_app/features/manager/bi_manager/view/widgets/bi_sales_c
 import 'package:farmacia_app/features/manager/bi_manager/view/widgets/comparison_card.dart';
 import 'package:farmacia_app/features/manager/bi_manager/view/widgets/bi_top_products.dart';
 import 'package:farmacia_app/features/manager/bi_manager/view_model/bi_manager_view_model.dart';
+import 'package:farmacia_app/features/manager/shared/widgets/notifications_bottom_sheet.dart';
+import 'package:farmacia_app/features/manager/shared/widgets/settings_bottom_sheet.dart';
+
 class BiManagerScreen extends StatefulWidget {
   const BiManagerScreen({super.key});
 
@@ -28,7 +31,7 @@ class _BiManagerScreenState extends State<BiManagerScreen> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
-      appBar: _buildAppBar(),
+      appBar: _buildAppBar(context),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
         child: Column(
@@ -103,11 +106,12 @@ class _BiManagerScreenState extends State<BiManagerScreen> {
     );
   }
 
-  PreferredSizeWidget _buildAppBar() {
+  PreferredSizeWidget _buildAppBar(BuildContext context) {
     return AppBar(
       backgroundColor: Pallete.whiteColor,
       elevation: 0,
       surfaceTintColor: Colors.transparent,
+      automaticallyImplyLeading: false,
       bottom: PreferredSize(
         preferredSize: const Size.fromHeight(1),
         child: Container(height: 1, color: Pallete.borderColor),
@@ -155,11 +159,11 @@ class _BiManagerScreenState extends State<BiManagerScreen> {
       actions: [
         IconButton(
           icon: const Icon(Icons.notifications_outlined, color: Pallete.textColor),
-          onPressed: () {},
+          onPressed: () => NotificationsBottomSheet.show(context),
         ),
         IconButton(
           icon: const Icon(Icons.settings_outlined, color: Pallete.textColor),
-          onPressed: () {},
+          onPressed: () => SettingsBottomSheet.show(context),
         ),
         const SizedBox(width: 4),
       ],

@@ -16,7 +16,6 @@ class ProfileManagerScreen extends StatefulWidget {
 class _ProfileManagerScreenState extends State<ProfileManagerScreen> {
   final _viewModel = ProfileManagerViewModel();
 
-  // Atualiza os dados do gerente quando ele salva o formulário
   void _onSave(String name, String role, String email) {
     setState(() {
       _viewModel.name = name;
@@ -24,7 +23,6 @@ class _ProfileManagerScreenState extends State<ProfileManagerScreen> {
       _viewModel.email = email;
     });
 
-    // Exibe um feedback visual para o usuário
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: const Text(
@@ -39,51 +37,50 @@ class _ProfileManagerScreenState extends State<ProfileManagerScreen> {
     );
   }
 
-  // Exibe um diálogo de confirmação antes de fazer logout
   void _onLogout() {
     showDialog(
-    context: context,
-    builder: (context) => AlertDialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      title: const Text(
-        'Sair da conta',
-        style: TextStyle(fontWeight: FontWeight.w700),
-      ),
-      content: const Text(
-        'Tem certeza que deseja sair?',
-        style: TextStyle(color: Pallete.textColor),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text(
-            'Cancelar',
-            style: TextStyle(color: Pallete.textColor),
-          ),
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text(
+          'Sair da conta',
+          style: TextStyle(fontWeight: FontWeight.w700),
         ),
-        ElevatedButton(
-          onPressed: () {
-            Navigator.pushNamedAndRemoveUntil(
-              context,
-              AppRoutes.login,
-              (route) => false, // remove todas as telas da pilha
-            );
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Pallete.primaryRed,
-            foregroundColor: Pallete.whiteColor,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
+        content: const Text(
+          'Tem certeza que deseja sair?',
+          style: TextStyle(color: Pallete.textColor),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text(
+              'Cancelar',
+              style: TextStyle(color: Pallete.textColor),
             ),
           ),
-          child: const Text(
-            'Sair',
-            style: TextStyle(fontWeight: FontWeight.w700),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                AppRoutes.login,
+                (route) => false,
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Pallete.primaryRed,
+              foregroundColor: Pallete.whiteColor,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: const Text(
+              'Sair',
+              style: TextStyle(fontWeight: FontWeight.w700),
+            ),
           ),
-        ),
-      ],
-    ),
-  );
+        ],
+      ),
+    );
   }
 
   @override
@@ -100,6 +97,7 @@ class _ProfileManagerScreenState extends State<ProfileManagerScreen> {
       backgroundColor: Pallete.whiteColor,
       elevation: 0,
       surfaceTintColor: Colors.transparent,
+      automaticallyImplyLeading: false,
       title: const Text(
         'Meu Perfil',
         style: TextStyle(
@@ -120,10 +118,11 @@ class _ProfileManagerScreenState extends State<ProfileManagerScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 28),
       child: Column(
         children: [
-          // Bloco de foto, nome e cargo
+          // Bloco de foto, nome, cargo e filial
           ProfileHeader(
             name: _viewModel.name,
             role: _viewModel.role,
+            filial: _viewModel.filial, // ← filial passada aqui
           ),
 
           const SizedBox(height: 28),

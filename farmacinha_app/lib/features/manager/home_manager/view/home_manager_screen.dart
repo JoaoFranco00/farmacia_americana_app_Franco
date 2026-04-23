@@ -5,6 +5,8 @@ import 'package:farmacia_app/features/manager/home_manager/view/widgets/sales_ch
 import 'package:farmacia_app/features/manager/home_manager/view/widgets/best_sellers.dart';
 import 'package:farmacia_app/features/manager/home_manager/view/widgets/recent_orders.dart';
 import 'package:farmacia_app/features/manager/home_manager/view_model/home_manager_view_model.dart';
+import 'package:farmacia_app/features/manager/shared/widgets/notifications_bottom_sheet.dart';
+import 'package:farmacia_app/features/manager/shared/widgets/settings_bottom_sheet.dart';
 
 class HomeManagerScreen extends StatelessWidget {
   const HomeManagerScreen({super.key});
@@ -15,16 +17,17 @@ class HomeManagerScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
-      appBar: _buildAppBar(),
-      body: _buildBody(viewModel),
+      appBar: _buildAppBar(context),
+      body: _buildBody(context, viewModel),
     );
   }
 
-  PreferredSizeWidget _buildAppBar() {
+  PreferredSizeWidget _buildAppBar(BuildContext context) {
     return AppBar(
       backgroundColor: Pallete.whiteColor,
       elevation: 0,
       surfaceTintColor: Colors.transparent,
+      automaticallyImplyLeading: false,
       bottom: PreferredSize(
         preferredSize: const Size.fromHeight(1),
         child: Container(height: 1, color: Pallete.borderColor),
@@ -72,18 +75,18 @@ class HomeManagerScreen extends StatelessWidget {
       actions: [
         IconButton(
           icon: const Icon(Icons.notifications_outlined, color: Pallete.textColor),
-          onPressed: () {},
+          onPressed: () => NotificationsBottomSheet.show(context),
         ),
         IconButton(
           icon: const Icon(Icons.settings_outlined, color: Pallete.textColor),
-          onPressed: () {},
+          onPressed: () => SettingsBottomSheet.show(context),
         ),
         const SizedBox(width: 4),
       ],
     );
   }
 
-  Widget _buildBody(HomeManagerViewModel viewModel) {
+  Widget _buildBody(BuildContext context, HomeManagerViewModel viewModel) {
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
       child: Column(
@@ -109,7 +112,23 @@ class HomeManagerScreen extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
-              onPressed: () {},
+              onPressed: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: const Text(
+                      '✅ Relatório gerado com sucesso! Disponível na seção de Documentos do sistema.',
+                      style: TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                    backgroundColor: const Color(0xFF10B981),
+                    behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    margin: const EdgeInsets.all(16),
+                    duration: const Duration(seconds: 3),
+                  ),
+                );
+              },
               icon: const Icon(Icons.analytics_rounded, size: 20),
               label: const Text(
                 'Gerar Relatório Estratégico',
