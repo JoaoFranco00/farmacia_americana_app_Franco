@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:farmacia_app/core/palette/pallete.dart';
 import 'package:farmacia_app/app/app_routes.dart';
 import 'package:farmacia_app/features/auth/view_models/auth_session_view_model.dart';
 import 'package:provider/provider.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await Supabase.initialize(
+    url: 'https://svutfmjjqkmfcyfgxgqq.supabase.co',
+    anonKey: 'sb_publishable_x4Dtp-jkbNuh7euNnFkzjQ_pL9NHceb',
+  );
+
   runApp(const MyApp());
 }
 

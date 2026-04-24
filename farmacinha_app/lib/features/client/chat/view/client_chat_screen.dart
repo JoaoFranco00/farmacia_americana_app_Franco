@@ -292,10 +292,10 @@ class _TopInfoIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: Color(0xFFFFD33D),
+        color: const Color(0xFFFFD33D),
         borderRadius: BorderRadius.circular(14),
       ),
-      child: SizedBox(
+      child: const SizedBox(
         width: 42,
         height: 42,
         child: Icon(Icons.smart_toy_rounded, color: Color(0xFF6E5C00)),

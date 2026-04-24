@@ -112,7 +112,7 @@ class _CartScreenState extends State<CartScreen> {
             Container(
               width: 96,
               height: 96,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: _cartSoft,
                 shape: BoxShape.circle,
               ),

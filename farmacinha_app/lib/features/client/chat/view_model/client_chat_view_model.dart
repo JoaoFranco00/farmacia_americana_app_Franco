@@ -163,11 +163,11 @@ class ClientChatViewModel extends ChangeNotifier {
 
   Map<String, ClientChatBotStep> _buildSteps() {
     return {
-      'main_menu': ClientChatBotStep(
+      'main_menu': const ClientChatBotStep(
         id: 'main_menu',
         message:
             'Bem-vindo(a) a Farmacia Americana.\n\nComo posso te ajudar hoje?\nEscolha uma opcao no proprio chat para continuar.',
-        options: const [
+        options: [
           ClientChatOption(
             id: 'products',
             label: 'Produtos & Estoque',
@@ -448,18 +448,18 @@ class ClientChatViewModel extends ChangeNotifier {
         startsHumanAttendance: _isWithinServiceHours(),
         enablesManualInput: _isWithinServiceHours(),
       ),
-      'leave_message': ClientChatBotStep(
+      'leave_message': const ClientChatBotStep(
         id: 'leave_message',
         message:
             'Perfeito. Escreva seu recado ou anexe um documento/imagem, e eu registrarei para a equipe humana continuar depois.',
-        options: const [],
+        options: [],
         enablesManualInput: true,
       ),
-      'leave_message_confirmation': ClientChatBotStep(
+      'leave_message_confirmation': const ClientChatBotStep(
         id: 'leave_message_confirmation',
         message:
             'Seu recado foi registrado com sucesso. Nossa equipe humana dara continuidade assim que possivel.',
-        options: const [
+        options: [
           ClientChatOption(
             id: 'new_human_attempt',
             label: 'Tentar falar com humano agora',
@@ -477,18 +477,18 @@ class ClientChatViewModel extends ChangeNotifier {
           ),
         ],
       ),
-      'request_callback': ClientChatBotStep(
+      'request_callback': const ClientChatBotStep(
         id: 'request_callback',
         message:
             'Escreva um telefone ou a melhor forma de contato e diga em que horario prefere receber retorno.',
-        options: const [],
+        options: [],
         enablesManualInput: true,
       ),
-      'request_callback_confirmation': ClientChatBotStep(
+      'request_callback_confirmation': const ClientChatBotStep(
         id: 'request_callback_confirmation',
         message:
             'Solicitacao de retorno registrada. Assim que um atendente estiver disponivel, a equipe fara contato.',
-        options: const [
+        options: [
           ClientChatOption(
             id: 'human_again',
             label: 'Tentar falar com humano agora',
@@ -506,11 +506,11 @@ class ClientChatViewModel extends ChangeNotifier {
           ),
         ],
       ),
-      'urgent_human': ClientChatBotStep(
+      'urgent_human': const ClientChatBotStep(
         id: 'urgent_human',
         message:
             'Sinalizei sua conversa como urgente e vou priorizar o atendimento humano agora.',
-        options: const [],
+        options: [],
         startsHumanAttendance: true,
         enablesManualInput: true,
       ),
@@ -683,7 +683,7 @@ class ClientChatViewModel extends ChangeNotifier {
 
   static bool _isWithinServiceHours() {
     final now = DateTime.now();
-    final openingHour = 8;
+    const openingHour = 8;
     final closingHour = now.weekday == DateTime.sunday ? 18 : 22;
     return now.hour >= openingHour && now.hour < closingHour;
   }

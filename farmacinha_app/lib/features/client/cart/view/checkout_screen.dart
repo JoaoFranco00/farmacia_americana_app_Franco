@@ -199,7 +199,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               Container(
                 width: 46,
                 height: 46,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: _checkoutSoft,
                   shape: BoxShape.circle,
                 ),
