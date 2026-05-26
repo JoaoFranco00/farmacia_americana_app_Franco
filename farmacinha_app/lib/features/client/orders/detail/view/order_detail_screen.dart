@@ -72,7 +72,10 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  OrderStatusStepper(currentStatus: order.status),
+                  OrderStatusStepper(
+                    currentStatus: order.status,
+                    isPickup: order.isPickup,
+                  ),
                   if (viewModel.formattedEstimatedDelivery != null) ...[
                     const SizedBox(height: 16),
                     Row(
@@ -212,7 +215,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                   const SizedBox(height: 10),
                   _DetailRow(
                     icon: Icons.location_on_rounded,
-                    label: 'Endereço de entrega',
+                    label: order.addressLabel,
                     value: order.deliveryAddress,
                   ),
                   const SizedBox(height: 10),

@@ -23,6 +23,17 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   final CartViewModel viewModel = CartViewModel.instance;
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      viewModel.loadUserAddresses().catchError((_) {});
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final horizontalPadding =
         MediaQuery.of(context).size.width < 360 ? 16.0 : 24.0;
@@ -250,7 +261,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     Text(
                       isDelivery
                           ? viewModel.selectedAddress.formattedLines
-                          : '${viewModel.storePickupAddress}\nRetirada disponível em até 20 min.',
+                          : '${viewModel.storePickupAddress}\nRetirada disponivel em ate 20 min.',
                       maxLines: 3,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
@@ -305,10 +316,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               const SizedBox(height: 12),
               _InfoLine(label: 'Email', value: viewModel.customerEmail),
               const SizedBox(height: 12),
-              _InfoLine(
-                label: 'Contato',
-                value: viewModel.selectedAddress.recipient,
-              ),
+              _InfoLine(label: 'Contato', value: viewModel.customerName),
             ],
           ),
         ),
@@ -543,6 +551,25 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   }
 
   Future<void> _openAddressSheet() async {
+    try {
+      await viewModel.loadUserAddresses(force: true);
+    } catch (error) {
+      if (!mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(error.toString().replaceFirst('Exception: ', '')),
+        ),
+      );
+      return;
+    }
+
+    if (!mounted) {
+      return;
+    }
+
     await showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.white,
@@ -566,6 +593,22 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   ),
                 ),
                 const SizedBox(height: 14),
+                if (viewModel.isLoadingAddresses)
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 20),
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        valueColor:
+                            AlwaysStoppedAnimation(Pallete.primaryRed),
+                      ),
+                    ),
+                  )
+                else if (viewModel.addresses.isEmpty)
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 20),
+                    child: Text('Nenhum endereço cadastrado.'),
+                  )
+                else
                 ...viewModel.addresses.map(
                   (address) => RadioListTile<String>(
                     value: address.id,

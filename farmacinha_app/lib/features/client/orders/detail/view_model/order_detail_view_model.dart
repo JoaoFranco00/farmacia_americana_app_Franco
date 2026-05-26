@@ -22,7 +22,8 @@ class OrderDetailViewModel extends ChangeNotifier {
 
   bool get canTrack =>
       order.status == OrderStatus.transit &&
-      order.trackingCode != null;
+      order.trackingCode != null &&
+      !order.isPickup;
 
   bool get isActive => order.status.isActive;
 }

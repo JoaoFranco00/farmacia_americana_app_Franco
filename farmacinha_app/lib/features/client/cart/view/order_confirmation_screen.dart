@@ -61,8 +61,10 @@ class OrderConfirmationScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 12),
-            const Text(
-              'Tudo pronto por aqui! Sua saúde está em boas mãos e logo estaremos na sua porta.',
+            Text(
+              order.isPickup
+                  ? 'Tudo pronto por aqui! Separemos seu pedido e avisaremos quando estiver pronto para retirada.'
+                  : 'Tudo pronto por aqui! Sua saúde está em boas mãos e logo estaremos na sua porta.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: _confirmationMuted,
@@ -89,7 +91,7 @@ class OrderConfirmationScreen extends StatelessWidget {
                     backgroundColor: const Color(0xFFFCD400),
                     icon: Icons.speed_rounded,
                     iconColor: const Color(0xFF6E5C00),
-                    label: 'ENTREGA ESTIMADA',
+                    label: order.isPickup ? 'RETIRADA ESTIMADA' : 'ENTREGA ESTIMADA',
                     value: _estimatedWindowLabel(order),
                     valueColor: const Color(0xFF564600),
                   ),
@@ -97,7 +99,7 @@ class OrderConfirmationScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 20),
-            _buildRouteCard(),
+            _buildRouteCard(order),
             const SizedBox(height: 30),
             SizedBox(
               width: double.infinity,
@@ -237,7 +239,7 @@ class OrderConfirmationScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildRouteCard() {
+  Widget _buildRouteCard(Order order) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(32),
       child: Container(
@@ -279,22 +281,24 @@ class OrderConfirmationScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     CircleAvatar(
                       radius: 15,
                       backgroundColor: Pallete.primaryRed,
                       child: Icon(
-                        Icons.local_shipping_rounded,
+                        order.isPickup
+                            ? Icons.storefront_rounded
+                            : Icons.local_shipping_rounded,
                         size: 16,
                         color: Colors.white,
                       ),
                     ),
-                    SizedBox(width: 12),
+                    const SizedBox(width: 12),
                     Text(
-                      'Em preparação',
-                      style: TextStyle(
+                      order.isPickup ? 'Retirada em preparo' : 'Em preparação',
+                      style: const TextStyle(
                         color: _confirmationText,
                         fontSize: 16,
                         fontWeight: FontWeight.w700,

@@ -4,10 +4,15 @@ import 'package:farmacia_app/features/client/orders/data/models/order_model.dart
 
 class OrderStatusStepper extends StatelessWidget {
   final OrderStatus currentStatus;
+  final bool isPickup;
 
-  const OrderStatusStepper({super.key, required this.currentStatus});
+  const OrderStatusStepper({
+    super.key,
+    required this.currentStatus,
+    this.isPickup = false,
+  });
 
-  static const List<_StepInfo> _steps = [
+  static const List<_StepInfo> _deliverySteps = [
     _StepInfo(
       status: OrderStatus.pending,
       label: 'Aguardando',
@@ -34,6 +39,36 @@ class OrderStatusStepper extends StatelessWidget {
       icon: Icons.check_circle_rounded,
     ),
   ];
+
+  static const List<_StepInfo> _pickupSteps = [
+    _StepInfo(
+      status: OrderStatus.pending,
+      label: 'Aguardando',
+      icon: Icons.hourglass_empty_rounded,
+    ),
+    _StepInfo(
+      status: OrderStatus.confirmed,
+      label: 'Confirmado',
+      icon: Icons.check_circle_outline_rounded,
+    ),
+    _StepInfo(
+      status: OrderStatus.preparing,
+      label: 'Em preparo',
+      icon: Icons.medication_rounded,
+    ),
+    _StepInfo(
+      status: OrderStatus.transit,
+      label: 'Pronto',
+      icon: Icons.storefront_rounded,
+    ),
+    _StepInfo(
+      status: OrderStatus.delivered,
+      label: 'Retirado',
+      icon: Icons.check_circle_rounded,
+    ),
+  ];
+
+  List<_StepInfo> get _steps => isPickup ? _pickupSteps : _deliverySteps;
 
   int get _currentStepIndex {
     if (currentStatus == OrderStatus.cancelled) return -1;

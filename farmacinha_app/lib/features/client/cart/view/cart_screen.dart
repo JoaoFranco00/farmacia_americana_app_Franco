@@ -80,8 +80,6 @@ class _CartScreenState extends State<CartScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildFulfillmentSelector(),
-                const SizedBox(height: 18),
                 ...viewModel.items.map(
                   (item) => Padding(
                     padding: const EdgeInsets.only(bottom: 18),
@@ -176,36 +174,6 @@ class _CartScreenState extends State<CartScreen> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildFulfillmentSelector() {
-    return Container(
-      padding: const EdgeInsets.all(6),
-      decoration: BoxDecoration(
-        color: _cartSoft,
-        borderRadius: BorderRadius.circular(999),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: _FulfillmentChip(
-              label: 'Entregar',
-              selected:
-                  viewModel.selectedFulfillmentType == CartFulfillmentType.delivery,
-              onTap: () => viewModel.selectFulfillmentType(CartFulfillmentType.delivery),
-            ),
-          ),
-          Expanded(
-            child: _FulfillmentChip(
-              label: 'Retirar',
-              selected:
-                  viewModel.selectedFulfillmentType == CartFulfillmentType.pickup,
-              onTap: () => viewModel.selectFulfillmentType(CartFulfillmentType.pickup),
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -754,51 +722,6 @@ class _QuantityStepper extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _FulfillmentChip extends StatelessWidget {
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-
-  const _FulfillmentChip({
-    required this.label,
-    required this.selected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        padding: const EdgeInsets.symmetric(vertical: 14),
-        decoration: BoxDecoration(
-          color: selected ? Colors.white : Colors.transparent,
-          borderRadius: BorderRadius.circular(999),
-          boxShadow: selected
-              ? [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.04),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ]
-              : null,
-        ),
-        child: Text(
-          label,
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            color: selected ? _cartText : _cartMuted,
-            fontSize: 15,
-            fontWeight: FontWeight.w800,
-          ),
-        ),
       ),
     );
   }

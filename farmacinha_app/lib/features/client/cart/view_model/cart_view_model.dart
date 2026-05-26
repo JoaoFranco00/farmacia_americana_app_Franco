@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:farmacia_app/features/auth/view_models/auth_session_view_model.dart';
 import 'package:farmacia_app/features/client/account/data/mocks/mock_delivery_addresses.dart';
 import 'package:farmacia_app/features/client/account/data/models/delivery_address_model.dart';
+import 'package:farmacia_app/features/client/account/data/repositories/client_addresses_repository.dart';
 import 'package:farmacia_app/features/client/home_client/data/models/product_model.dart';
 import 'package:farmacia_app/features/client/orders/data/models/order_model.dart';
 import 'package:farmacia_app/features/client/orders/view_model/orders_store.dart';
@@ -18,15 +19,21 @@ class CartViewModel extends ChangeNotifier {
 
   final AuthSessionViewModel _authSession = AuthSessionViewModel.instance;
   final OrdersStore _ordersStore = OrdersStore.instance;
+  final ClientAddressesRepository _addressesRepository =
+      ClientAddressesRepository.instance;
 
   final List<CartItem> _items = <CartItem>[];
-  final List<DeliveryAddress> _addresses = MockDeliveryAddresses.getAddresses();
+  final List<DeliveryAddress> _addresses = List<DeliveryAddress>.of(
+    MockDeliveryAddresses.getAddresses(),
+  );
 
   String? _appliedCouponCode;
   PaymentMethod _selectedPaymentMethod = PaymentMethod.cardOnDelivery;
   CartFulfillmentType _selectedFulfillmentType = CartFulfillmentType.delivery;
   String _selectedAddressId = 'home-main';
   bool _isProcessingCheckout = false;
+  bool _isLoadingAddresses = false;
+  bool _hasLoadedUserAddresses = false;
   Order? _lastPlacedOrder;
 
   List<CartItem> get items => List<CartItem>.unmodifiable(_items);
@@ -35,6 +42,7 @@ class CartViewModel extends ChangeNotifier {
   bool get isEmpty => _items.isEmpty;
   bool get isNotEmpty => _items.isNotEmpty;
   bool get isProcessingCheckout => _isProcessingCheckout;
+  bool get isLoadingAddresses => _isLoadingAddresses;
   String? get appliedCouponCode => _appliedCouponCode;
   PaymentMethod get selectedPaymentMethod => _selectedPaymentMethod;
   CartFulfillmentType get selectedFulfillmentType => _selectedFulfillmentType;
@@ -247,6 +255,48 @@ class CartViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> loadUserAddresses({bool force = false}) async {
+    if (_isLoadingAddresses || (!force && _hasLoadedUserAddresses)) {
+      return;
+    }
+
+    if (_authSession.currentUser == null) {
+      _hasLoadedUserAddresses = true;
+      return;
+    }
+
+    _isLoadingAddresses = true;
+    notifyListeners();
+
+    try {
+      final userAddresses =
+          await _addressesRepository.fetchCurrentUserAddresses();
+      if (userAddresses.isEmpty) {
+        return;
+      }
+
+      _addresses
+        ..clear()
+        ..addAll(userAddresses);
+
+      final selectedStillExists =
+          _addresses.any((address) => address.id == _selectedAddressId);
+      if (!selectedStillExists) {
+        _selectedAddressId = _addresses
+            .firstWhere(
+              (address) => address.isDefault,
+              orElse: () => _addresses.first,
+            )
+            .id;
+      }
+
+      _hasLoadedUserAddresses = true;
+    } finally {
+      _isLoadingAddresses = false;
+      notifyListeners();
+    }
+  }
+
   Future<Order?> checkout() async {
     if (_items.isEmpty || _isProcessingCheckout) {
       return null;
@@ -256,6 +306,10 @@ class CartViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
+      if (_selectedFulfillmentType == CartFulfillmentType.delivery) {
+        await loadUserAddresses(force: true);
+      }
+
       final now = DateTime.now();
       final estimatedDelivery =
           _selectedFulfillmentType == CartFulfillmentType.delivery
@@ -280,7 +334,7 @@ class CartViewModel extends ChangeNotifier {
         deliveryAddress:
             _selectedFulfillmentType == CartFulfillmentType.delivery
             ? selectedAddress.singleLineAddress
-            : storePickupAddress,
+            : 'Retirada em $storePickupLabel - $storePickupAddress',
         estimatedDelivery: estimatedDelivery,
         trackingCode: 'BR${now.millisecondsSinceEpoch.toString().substring(6)}',
       );
