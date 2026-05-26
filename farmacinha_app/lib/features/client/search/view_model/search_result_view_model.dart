@@ -24,6 +24,7 @@ class SearchResultViewModel extends ChangeNotifier {
   String searchQuery = '';
   bool isLoading = false;
   bool usedAiSearch = false;
+  bool _disposed = false;
 
   Future<void> search(String query) async {
     final trimmedQuery = query.trim();
@@ -31,28 +32,40 @@ class SearchResultViewModel extends ChangeNotifier {
     isLoading = true;
     searchQuery = trimmedQuery;
     usedAiSearch = false;
-    notifyListeners();
+    safeNotifyListeners();
 
     if (trimmedQuery.isEmpty) {
       filteredProducts = [];
       similarProducts = [];
       isLoading = false;
-      notifyListeners();
+      safeNotifyListeners();
       return;
     }
 
     try {
       final allProducts = await ProductsRepository.instance
           .fetchActiveProducts();
+      if (_disposed) return;
 
       final localResults = _searchLocally(trimmedQuery, allProducts);
       filteredProducts = localResults;
+
+      if (localResults.isNotEmpty) {
+        similarProducts = _buildSimilarProducts(
+          query: trimmedQuery,
+          results: filteredProducts,
+          allProducts: allProducts,
+        );
+        return;
+      }
 
       try {
         final aiResult = await _searchAiService.searchProducts(
           query: trimmedQuery,
           products: allProducts,
         );
+        if (_disposed) return;
+
         final aiProducts = _filterRelevantAiProducts(
           query: trimmedQuery,
           products: _productsFromAiIds(aiResult.productIds, allProducts),
@@ -87,12 +100,14 @@ class SearchResultViewModel extends ChangeNotifier {
       );
     } catch (error) {
       debugPrint('Erro ao buscar produtos no Supabase: $error');
+      if (_disposed) return;
       filteredProducts = [];
       similarProducts = [];
       usedAiSearch = false;
     } finally {
+      if (_disposed) return;
       isLoading = false;
-      notifyListeners();
+      safeNotifyListeners();
     }
   }
 
@@ -126,7 +141,7 @@ class SearchResultViewModel extends ChangeNotifier {
     required List<Product> products,
   }) {
     final normalizedQuery = _normalize(query);
-    final queryTerms = _queryTermsFor(normalizedQuery);
+    final queryTerms = _queryTermsFor(normalizedQuery, expandTerms: false);
 
     return products
         .where((product) {
@@ -246,13 +261,16 @@ class SearchResultViewModel extends ChangeNotifier {
     return score;
   }
 
-  Set<String> _queryTermsFor(String normalizedQuery) {
+  Set<String> _queryTermsFor(
+    String normalizedQuery, {
+    bool expandTerms = true,
+  }) {
     return {
       ...normalizedQuery
           .split(' ')
           .where((term) => term.length > 2)
           .where((term) => !_ignoredSearchTerms.contains(term)),
-      ..._expandedTermsFor(normalizedQuery),
+      if (expandTerms) ..._expandedTermsFor(normalizedQuery),
     };
   }
 
@@ -381,8 +399,15 @@ class SearchResultViewModel extends ChangeNotifier {
 
   @override
   void dispose() {
+    _disposed = true;
     _searchAiService.dispose();
     super.dispose();
+  }
+
+  void safeNotifyListeners() {
+    if (!_disposed) {
+      notifyListeners();
+    }
   }
 }
 
