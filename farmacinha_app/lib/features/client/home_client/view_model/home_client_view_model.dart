@@ -1,4 +1,5 @@
 import 'package:farmacia_app/features/auth/view_models/auth_session_view_model.dart';
+import 'package:farmacia_app/features/auth/data/models/user_model.dart';
 import 'package:farmacia_app/features/client/cart/view_model/cart_view_model.dart';
 import 'package:farmacia_app/features/client/home_client/data/mocks/mock_banners.dart';
 import 'package:farmacia_app/features/client/home_client/data/models/banner_model.dart';
@@ -37,6 +38,7 @@ class HomeClientViewModel extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
   bool get isGuest => _authSession.isGuest || !_authSession.isAuthenticated;
+  User? get currentUser => _authSession.currentUser;
 
   Future<void> refreshProducts() async {
     _setLoading(true);

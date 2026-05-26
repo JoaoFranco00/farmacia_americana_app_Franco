@@ -23,6 +23,7 @@ class _HomeClientScreenState extends State<HomeClientScreen> {
   final NotificationsViewModel notificationsViewModel =
       NotificationsViewModel();
   int _currentTabIndex = 0;
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void dispose() {
@@ -62,13 +63,15 @@ class _HomeClientScreenState extends State<HomeClientScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: Pallete.backgroundColor,
+      drawer: _buildClientDrawer(),
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(kToolbarHeight),
         child: ListenableBuilder(
           listenable: notificationsViewModel,
           builder: (context, _) => CustomAppBar(
-            onMenuTap: () => debugPrint('Abrir Drawer'),
+            onMenuTap: () => _scaffoldKey.currentState?.openDrawer(),
             onNotificationTap: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
@@ -183,6 +186,78 @@ class _HomeClientScreenState extends State<HomeClientScreen> {
     );
   }
 
+  Widget _buildClientDrawer() {
+    return Drawer(
+      backgroundColor: Pallete.whiteColor,
+      child: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 14),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Farmácia Americana',
+                    style: TextStyle(
+                      color: Pallete.primaryRed,
+                      fontSize: 22,
+                      fontWeight: FontWeight.w900,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    viewModel.currentUser?.name ?? 'Olá, visitante',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: Pallete.textColor,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Divider(height: 1),
+            _DrawerItem(
+              icon: Icons.home_rounded,
+              label: 'Início',
+              onTap: () => Navigator.of(context).pop(),
+            ),
+            _DrawerItem(
+              icon: Icons.shopping_bag_rounded,
+              label: 'Meus pedidos',
+              onTap: () => _navigateFromDrawer(AppRoutes.orders),
+            ),
+            _DrawerItem(
+              icon: Icons.location_on_rounded,
+              label: 'Endereços',
+              onTap: () => _navigateFromDrawer(AppRoutes.addresses),
+            ),
+            _DrawerItem(
+              icon: Icons.chat_bubble_rounded,
+              label: 'Atendimento',
+              onTap: () => _navigateFromDrawer(AppRoutes.clientChat),
+            ),
+            _DrawerItem(
+              icon: Icons.person_rounded,
+              label: 'Minha conta',
+              onTap: () => _navigateFromDrawer(AppRoutes.account),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _navigateFromDrawer(String routeName) {
+    Navigator.of(context).pop();
+    Navigator.of(context).pushNamed(routeName);
+  }
+
   Widget _buildSearchBar() {
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -248,6 +323,34 @@ class _HomeClientScreenState extends State<HomeClientScreen> {
           );
         },
       ),
+    );
+  }
+}
+
+class _DrawerItem extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  const _DrawerItem({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: Icon(icon, color: Pallete.primaryRed),
+      title: Text(
+        label,
+        style: const TextStyle(
+          color: Color(0xFF291715),
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+      trailing: const Icon(Icons.chevron_right_rounded),
+      onTap: onTap,
     );
   }
 }

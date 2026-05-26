@@ -205,6 +205,27 @@ class Order {
 
   int get itemCount => items.fold(0, (sum, item) => sum + item.quantity);
 
+  bool get isPickup {
+    final normalizedAddress = deliveryAddress.toLowerCase();
+    return normalizedAddress.contains('retirada') ||
+        normalizedAddress.contains('farmácia americana paulista') ||
+        normalizedAddress.contains('farmacia americana paulista') ||
+        normalizedAddress.contains('avenida paulista, 1500 - bela vista');
+  }
+
+  String get fulfillmentLabel => isPickup ? 'Retirada' : 'Entrega';
+
+  String get addressLabel =>
+      isPickup ? 'Local de retirada' : 'Endereço de entrega';
+
+  String get statusLabel {
+    if (isPickup && status == OrderStatus.transit) {
+      return 'Pronto para retirada';
+    }
+
+    return status.label;
+  }
+
   static String _formatOrderId(Object? id, DateTime createdAt) {
     final sequence = id?.toString().padLeft(4, '0') ?? '0000';
     return 'PED-${createdAt.year}-$sequence';

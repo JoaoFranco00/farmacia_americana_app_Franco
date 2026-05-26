@@ -40,7 +40,7 @@ class OrderItemTile extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
-                    _statusIcon(order.status),
+                    _statusIcon(order.status, order.isPickup),
                     color: _statusColor(order.status),
                     size: 22,
                   ),
@@ -154,7 +154,7 @@ class OrderItemTile extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 2),
-                    _StatusChip(status: order.status),
+                    _StatusChip(order: order),
                   ],
                 ),
               ],
@@ -165,7 +165,7 @@ class OrderItemTile extends StatelessWidget {
     );
   }
 
-  IconData _statusIcon(OrderStatus status) {
+  IconData _statusIcon(OrderStatus status, bool isPickup) {
     switch (status) {
       case OrderStatus.pending:
         return Icons.hourglass_empty_rounded;
@@ -174,7 +174,9 @@ class OrderItemTile extends StatelessWidget {
       case OrderStatus.preparing:
         return Icons.medication_rounded;
       case OrderStatus.transit:
-        return Icons.local_shipping_rounded;
+        return isPickup
+            ? Icons.storefront_rounded
+            : Icons.local_shipping_rounded;
       case OrderStatus.delivered:
         return Icons.check_circle_rounded;
       case OrderStatus.cancelled:
@@ -205,11 +207,12 @@ class OrderItemTile extends StatelessWidget {
 }
 
 class _StatusChip extends StatelessWidget {
-  final OrderStatus status;
-  const _StatusChip({required this.status});
+  final Order order;
+  const _StatusChip({required this.order});
 
   @override
   Widget build(BuildContext context) {
+    final status = order.status;
     final color = _color(status);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
@@ -218,7 +221,7 @@ class _StatusChip extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
-        status.label,
+        order.statusLabel,
         style: TextStyle(
           fontSize: 10,
           fontWeight: FontWeight.w600,

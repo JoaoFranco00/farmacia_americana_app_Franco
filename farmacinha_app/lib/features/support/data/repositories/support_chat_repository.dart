@@ -501,6 +501,8 @@ class SupportChatRepository {
       );
     }
 
+    final shouldSendClaimNotice = conversation.attendantId == null;
+
     if (conversation.attendantId == null) {
       await _client
           .from(_conversationTable)
@@ -519,6 +521,18 @@ class SupportChatRepository {
     if (claimedConversation?.attendantId != authUser.id) {
       throw Exception(
         'Essa conversa ja foi assumida por ${claimedConversation?.attendantName ?? 'outro atendente'}.',
+      );
+    }
+
+    if (shouldSendClaimNotice && claimedConversation != null) {
+      await _insertMessage(
+        conversationId: claimedConversation.id,
+        senderId: authUser.id,
+        senderType: SupportSenderType.system,
+        senderName: 'Farmacia Americana',
+        body:
+            '${claimedConversation.attendantName ?? 'Um atendente'} entrou no atendimento.',
+        messageType: SupportMessageType.text,
       );
     }
 
@@ -545,7 +559,11 @@ class SupportChatRepository {
       conversationId: claimedConversation.id,
       senderId: authUser.id,
       senderType: SupportSenderType.attendant,
-      senderName: _profileName(profile, fallbackId: authUser.id),
+      senderName: _profileName(
+        profile,
+        fallbackId: authUser.id,
+        fallbackPrefix: 'Atendente',
+      ),
       body: text,
       messageType: SupportMessageType.text,
     );
@@ -666,7 +684,11 @@ class SupportChatRepository {
       attendantId: attendantId.isEmpty ? null : attendantId,
       attendantName: attendantId.isEmpty
           ? null
-          : _profileName(attendantProfile, fallbackId: attendantId),
+          : _profileName(
+              attendantProfile,
+              fallbackId: attendantId,
+              fallbackPrefix: 'Atendente',
+            ),
       status: (conversation['status'] ?? 'novo').toString(),
       isUrgent: conversation['is_urgent'] == true,
       lastMessagePreview: lastMessagePreview.isEmpty
@@ -685,16 +707,17 @@ class SupportChatRepository {
   }
 
   SupportMessageRecord _mapMessage(Map<String, dynamic> message) {
+    final senderType = _parseSenderType(message['sender_type']?.toString());
+    final rawSenderName = (message['sender_name'] ?? '').toString().trim();
+
     return SupportMessageRecord(
       id: (message['id'] ?? '').toString(),
       conversationId: (message['conversation_id'] ?? '').toString(),
       senderId: (message['sender_id'] ?? '').toString().trim().isEmpty
           ? null
           : (message['sender_id'] ?? '').toString(),
-      senderName: (message['sender_name'] ?? '').toString().trim().isEmpty
-          ? null
-          : (message['sender_name'] ?? '').toString(),
-      senderType: _parseSenderType(message['sender_type']?.toString()),
+      senderName: _displaySenderName(rawSenderName, senderType),
+      senderType: senderType,
       messageType: _parseMessageType(message['message_type']?.toString()),
       body: (message['body'] ?? '').toString().trim().isEmpty
           ? null
@@ -711,6 +734,22 @@ class SupportChatRepository {
           tryParseUtcToLocal(message['created_at']?.toString()) ??
           DateTime.now(),
     );
+  }
+
+  String? _displaySenderName(String rawName, SupportSenderType senderType) {
+    if (rawName.isEmpty) {
+      return senderType == SupportSenderType.attendant ? 'Atendente' : null;
+    }
+
+    if (senderType == SupportSenderType.attendant &&
+        rawName.toLowerCase().startsWith('cliente ')) {
+      return rawName.replaceFirst(
+        RegExp('cliente', caseSensitive: false),
+        'Atendente',
+      );
+    }
+
+    return rawName;
   }
 
   Future<void> _insertMessage({
@@ -734,6 +773,16 @@ class SupportChatRepository {
         'attachment_name': attachmentName,
         'attachment_details': attachmentDetails,
       });
+      await _client
+          .from(_conversationTable)
+          .update({
+            'last_message_preview': _previewForMessage(
+              body: body,
+              attachmentName: attachmentName,
+            ),
+            'last_message_at': nowUtc().toIso8601String(),
+          })
+          .eq('id', conversationId);
     } on PostgrestException catch (error) {
       throw Exception(_formatSchemaError(error));
     }
@@ -742,6 +791,7 @@ class SupportChatRepository {
   String _profileName(
     Map<String, dynamic> profile, {
     required String fallbackId,
+    String fallbackPrefix = 'Cliente',
   }) {
     final fullName = (profile['full_name'] ?? '').toString().trim();
     if (fullName.isNotEmpty) {
@@ -754,10 +804,24 @@ class SupportChatRepository {
     }
 
     if (fallbackId.length >= 6) {
-      return 'Cliente ${fallbackId.substring(0, 6)}';
+      return '$fallbackPrefix ${fallbackId.substring(0, 6)}';
     }
 
-    return 'Cliente';
+    return fallbackPrefix;
+  }
+
+  String _previewForMessage({String? body, String? attachmentName}) {
+    final text = body?.trim();
+    if (text != null && text.isNotEmpty) {
+      return text.length > 120 ? '${text.substring(0, 117)}...' : text;
+    }
+
+    final fileName = attachmentName?.trim();
+    if (fileName != null && fileName.isNotEmpty) {
+      return 'Anexo: $fileName';
+    }
+
+    return 'Nova mensagem.';
   }
 
   SupportSenderType _parseSenderType(String? value) {
