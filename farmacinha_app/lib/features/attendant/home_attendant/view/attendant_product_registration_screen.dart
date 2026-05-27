@@ -1,5 +1,6 @@
 import 'package:farmacia_app/core/palette/pallete.dart';
 import 'package:farmacia_app/features/attendant/home_attendant/data/models/attendant_stock_product_model.dart';
+import 'package:farmacia_app/features/attendant/home_attendant/view/utils/attendant_navigation.dart';
 import 'package:farmacia_app/features/attendant/home_attendant/view_model/attendant_product_registration_view_model.dart';
 import 'package:farmacia_app/features/attendant/home_attendant/view_model/attendant_profile_data_store.dart';
 import 'package:farmacia_app/features/client/home_client/data/models/product_model.dart';
@@ -161,59 +162,74 @@ class _AttendantProductRegistrationScreenState
       builder: (context, _) {
         final isForm = _viewModel.mode == AttendantStockControlMode.form;
 
-        return Scaffold(
-          backgroundColor: const Color(0xFFF9F9F9),
-          appBar: AppBar(
+        return PopScope<Object?>(
+          canPop: !isForm && Navigator.of(context).canPop(),
+          onPopInvokedWithResult: (didPop, result) {
+            if (didPop) {
+              return;
+            }
+
+            if (isForm) {
+              _viewModel.showProductList();
+              return;
+            }
+
+            popOrGoToAttendantHome(context);
+          },
+          child: Scaffold(
             backgroundColor: const Color(0xFFF9F9F9),
-            elevation: 0,
-            surfaceTintColor: const Color(0xFFF9F9F9),
-            leading: IconButton(
-              onPressed: isForm
-                  ? _viewModel.showProductList
-                  : () => Navigator.pop(context),
-              icon: const Icon(
-                Icons.arrow_back_rounded,
-                color: Pallete.primaryRed,
-              ),
-            ),
-            titleSpacing: 0,
-            title: const Text(
-              'Controle de Estoque',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: Pallete.primaryRed,
-                fontSize: 21,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-            actions: [
-              if (!isForm)
-                IconButton(
-                  onPressed: _viewModel.refreshProducts,
-                  icon: const Icon(
-                    Icons.refresh_rounded,
-                    color: Pallete.primaryRed,
-                  ),
+            appBar: AppBar(
+              backgroundColor: const Color(0xFFF9F9F9),
+              elevation: 0,
+              surfaceTintColor: const Color(0xFFF9F9F9),
+              leading: IconButton(
+                onPressed: isForm
+                    ? _viewModel.showProductList
+                    : () => popOrGoToAttendantHome(context),
+                icon: const Icon(
+                  Icons.arrow_back_rounded,
+                  color: Pallete.primaryRed,
                 ),
-              if (!isForm)
-                Padding(
-                  padding: const EdgeInsets.only(right: 12),
-                  child: IconButton.filled(
-                    onPressed: _viewModel.startNewProduct,
-                    style: IconButton.styleFrom(
-                      backgroundColor: Pallete.primaryRed,
-                      foregroundColor: Colors.white,
+              ),
+              titleSpacing: 0,
+              title: const Text(
+                'Controle de Estoque',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: Pallete.primaryRed,
+                  fontSize: 21,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              actions: [
+                if (!isForm)
+                  IconButton(
+                    onPressed: _viewModel.refreshProducts,
+                    icon: const Icon(
+                      Icons.refresh_rounded,
+                      color: Pallete.primaryRed,
                     ),
-                    icon: const Icon(Icons.add_rounded),
                   ),
-                ),
-            ],
+                if (!isForm)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 12),
+                    child: IconButton.filled(
+                      onPressed: _viewModel.startNewProduct,
+                      style: IconButton.styleFrom(
+                        backgroundColor: Pallete.primaryRed,
+                        foregroundColor: Colors.white,
+                      ),
+                      icon: const Icon(Icons.add_rounded),
+                    ),
+                  ),
+              ],
+            ),
+            body: SafeArea(
+              child: isForm ? _buildProductForm() : _buildProductList(),
+            ),
+            bottomNavigationBar: isForm ? _buildFormActionBar() : null,
           ),
-          body: SafeArea(
-            child: isForm ? _buildProductForm() : _buildProductList(),
-          ),
-          bottomNavigationBar: isForm ? _buildFormActionBar() : null,
         );
       },
     );

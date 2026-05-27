@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:farmacia_app/app/app_routes.dart';
 import 'package:farmacia_app/core/palette/pallete.dart';
+import 'package:farmacia_app/features/attendant/home_attendant/view/utils/attendant_navigation.dart';
 import 'package:farmacia_app/features/attendant/home_attendant/view_model/attendant_personal_viewl_model.dart';
 
 class AttendantPersonalDataScreen extends StatefulWidget {
@@ -33,111 +34,116 @@ class _AttendantPersonalDataScreenState
     return ListenableBuilder(
       listenable: _viewModel,
       builder: (context, _) {
-        return Scaffold(
-          backgroundColor: const Color(0xFFFFF8F7),
-          appBar: AppBar(
+        return PopScope<Object?>(
+          canPop: Navigator.of(context).canPop(),
+          onPopInvokedWithResult: (didPop, result) =>
+              handleAttendantBack(context, didPop),
+          child: Scaffold(
             backgroundColor: const Color(0xFFFFF8F7),
-            elevation: 0,
-            leading: IconButton(
-              icon: const Icon(
-                Icons.arrow_back_rounded,
-                color: Pallete.primaryRed,
+            appBar: AppBar(
+              backgroundColor: const Color(0xFFFFF8F7),
+              elevation: 0,
+              leading: IconButton(
+                icon: const Icon(
+                  Icons.arrow_back_rounded,
+                  color: Pallete.primaryRed,
+                ),
+                onPressed: () => popOrGoToAttendantHome(context),
               ),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-            title: const Text(
-              'Dados Pessoais',
-              style: TextStyle(
-                color: Pallete.primaryRed,
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
+              title: const Text(
+                'Dados Pessoais',
+                style: TextStyle(
+                  color: Pallete.primaryRed,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
               ),
             ),
-          ),
-          body: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(24, 18, 24, 32),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildInputLabel('NOME COMPLETO'),
-                _buildTextField(
-                  controller: _viewModel.nameController,
-                  hint: 'Digite seu nome completo',
-                  icon: Icons.person,
-                  focusNode: _viewModel.nameFocusNode,
-                  isPrefilled: _viewModel.isNamePrefilled,
-                  keyboardType: TextInputType.text,
-                  textCapitalization: TextCapitalization.words,
+            body: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(24, 18, 24, 32),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildInputLabel('NOME COMPLETO'),
+                  _buildTextField(
+                    controller: _viewModel.nameController,
+                    hint: 'Digite seu nome completo',
+                    icon: Icons.person,
+                    focusNode: _viewModel.nameFocusNode,
+                    isPrefilled: _viewModel.isNamePrefilled,
+                    keyboardType: TextInputType.text,
+                    textCapitalization: TextCapitalization.words,
+                  ),
+                  const SizedBox(height: 20),
+                  _buildInputLabel('E-MAIL'),
+                  _buildTextField(
+                    controller: _viewModel.emailController,
+                    hint: 'seu@email.com',
+                    icon: Icons.mail,
+                    focusNode: _viewModel.emailFocusNode,
+                    isPrefilled: _viewModel.isEmailPrefilled,
+                    keyboardType: TextInputType.emailAddress,
+                  ),
+                  const SizedBox(height: 20),
+                  _buildInputLabel('CPF'),
+                  _buildTextField(
+                    controller: _viewModel.cpfController,
+                    hint: '000.000.000-00',
+                    icon: Icons.badge,
+                    focusNode: _viewModel.cpfFocusNode,
+                    isPrefilled: _viewModel.isCpfPrefilled,
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                      CpfInputFormatter(),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  _buildInputLabel('TELEFONE'),
+                  _buildTextField(
+                    controller: _viewModel.phoneController,
+                    hint: '(00) 00000-0000',
+                    icon: Icons.call,
+                    focusNode: _viewModel.phoneFocusNode,
+                    isPrefilled: _viewModel.isPhonePrefilled,
+                    keyboardType: TextInputType.phone,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                      PhoneInputFormatter(),
+                    ],
+                  ),
+                  const SizedBox(height: 28),
+                  _buildSecurityCard(),
+                  const SizedBox(height: 32),
+                  _buildSaveButton(),
+                ],
+              ),
+            ),
+            bottomNavigationBar: BottomNavigationBar(
+              currentIndex: 3,
+              onTap: (index) => _onBottomNavTap(context, index),
+              type: BottomNavigationBarType.fixed,
+              selectedItemColor: Pallete.primaryRed,
+              unselectedItemColor: const Color(0xFF9F9F9F),
+              items: const [
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.home_rounded),
+                  label: 'IN\u00cdCIO',
                 ),
-                const SizedBox(height: 20),
-                _buildInputLabel('E-MAIL'),
-                _buildTextField(
-                  controller: _viewModel.emailController,
-                  hint: 'seu@email.com',
-                  icon: Icons.mail,
-                  focusNode: _viewModel.emailFocusNode,
-                  isPrefilled: _viewModel.isEmailPrefilled,
-                  keyboardType: TextInputType.emailAddress,
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.inventory_2_rounded),
+                  label: 'ESTOQUE',
                 ),
-                const SizedBox(height: 20),
-                _buildInputLabel('CPF'),
-                _buildTextField(
-                  controller: _viewModel.cpfController,
-                  hint: '000.000.000-00',
-                  icon: Icons.badge,
-                  focusNode: _viewModel.cpfFocusNode,
-                  isPrefilled: _viewModel.isCpfPrefilled,
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [
-                    FilteringTextInputFormatter.digitsOnly,
-                    CpfInputFormatter(),
-                  ],
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.chat_bubble),
+                  label: 'CHAT',
                 ),
-                const SizedBox(height: 20),
-                _buildInputLabel('TELEFONE'),
-                _buildTextField(
-                  controller: _viewModel.phoneController,
-                  hint: '(00) 00000-0000',
-                  icon: Icons.call,
-                  focusNode: _viewModel.phoneFocusNode,
-                  isPrefilled: _viewModel.isPhonePrefilled,
-                  keyboardType: TextInputType.phone,
-                  inputFormatters: [
-                    FilteringTextInputFormatter.digitsOnly,
-                    PhoneInputFormatter(),
-                  ],
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.person),
+                  label: 'PERFIL',
                 ),
-                const SizedBox(height: 28),
-                _buildSecurityCard(),
-                const SizedBox(height: 32),
-                _buildSaveButton(),
               ],
             ),
-          ),
-          bottomNavigationBar: BottomNavigationBar(
-            currentIndex: 3,
-            onTap: (index) => _onBottomNavTap(context, index),
-            type: BottomNavigationBarType.fixed,
-            selectedItemColor: Pallete.primaryRed,
-            unselectedItemColor: const Color(0xFF9F9F9F),
-            items: const [
-              BottomNavigationBarItem(
-                icon: Icon(Icons.home_rounded),
-                label: 'IN\u00cdCIO',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.inventory_2_rounded),
-                label: 'ESTOQUE',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.chat_bubble),
-                label: 'CHAT',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.person),
-                label: 'PERFIL',
-              ),
-            ],
           ),
         );
       },
@@ -320,7 +326,7 @@ class _AttendantPersonalDataScreenState
   void _savePersonalData() {
     _viewModel.savePersonalData();
     _showInfo('Dados salvos com sucesso!');
-    Navigator.of(context).pop();
+    popOrGoToAttendantHome(context);
   }
 
   void _onBottomNavTap(BuildContext context, int index) {

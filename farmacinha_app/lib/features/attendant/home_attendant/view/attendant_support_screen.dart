@@ -1,57 +1,66 @@
 import 'package:flutter/material.dart';
 import 'package:farmacia_app/core/palette/pallete.dart';
+import 'package:farmacia_app/features/attendant/home_attendant/view/utils/attendant_navigation.dart';
 
 class AttendantSupportScreen extends StatelessWidget {
   const AttendantSupportScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFFFFAF7),
-      appBar: AppBar(
+    return PopScope<Object?>(
+      canPop: Navigator.of(context).canPop(),
+      onPopInvokedWithResult: (didPop, result) =>
+          handleAttendantBack(context, didPop),
+      child: Scaffold(
         backgroundColor: const Color(0xFFFFFAF7),
-        surfaceTintColor: const Color(0xFFFFFAF7),
-        elevation: 0,
-        leading: IconButton(
-          onPressed: () => Navigator.of(context).pop(),
-          icon: const Icon(Icons.arrow_back_rounded, color: Pallete.primaryRed),
-        ),
-        titleSpacing: 0,
-        title: const Text(
-          'Ajuda e Suporte',
-          style: TextStyle(
-            color: Color(0xFF212121),
-            fontSize: 20,
-            fontWeight: FontWeight.w700,
+        appBar: AppBar(
+          backgroundColor: const Color(0xFFFFFAF7),
+          surfaceTintColor: const Color(0xFFFFFAF7),
+          elevation: 0,
+          leading: IconButton(
+            onPressed: () => popOrGoToAttendantHome(context),
+            icon: const Icon(
+              Icons.arrow_back_rounded,
+              color: Pallete.primaryRed,
+            ),
+          ),
+          titleSpacing: 0,
+          title: const Text(
+            'Ajuda e Suporte',
+            style: TextStyle(
+              color: Color(0xFF212121),
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ),
-      ),
-      body: const SafeArea(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.fromLTRB(16, 10, 16, 28),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _SupportHero(),
-              SizedBox(height: 28),
-              _SupportCard(
-                icon: Icons.mail_rounded,
-                iconColor: Pallete.primaryRed,
-                iconBackground: Color(0xFFFFF1F2),
-                label: 'E-MAIL CORPORATIVO',
-                value: 'suportedev@gmail.com',
-              ),
-              SizedBox(height: 14),
-              _SupportCard(
-                icon: Icons.phone_in_talk_rounded,
-                iconColor: Color(0xFF8A6A14),
-                iconBackground: Color(0xFFFFF8DE),
-                label: 'WHATSAPP E CENTRAL',
-                value: '+55 19 99543-6548',
-              ),
-              SizedBox(height: 14),
-              _SupportScheduleCard(),
-            ],
+        body: const SafeArea(
+          child: SingleChildScrollView(
+            padding: EdgeInsets.fromLTRB(16, 10, 16, 28),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _SupportHero(),
+                SizedBox(height: 28),
+                _SupportCard(
+                  icon: Icons.mail_rounded,
+                  iconColor: Pallete.primaryRed,
+                  iconBackground: Color(0xFFFFF1F2),
+                  label: 'E-MAIL CORPORATIVO',
+                  value: 'suportedev@gmail.com',
+                ),
+                SizedBox(height: 14),
+                _SupportCard(
+                  icon: Icons.phone_in_talk_rounded,
+                  iconColor: Color(0xFF8A6A14),
+                  iconBackground: Color(0xFFFFF8DE),
+                  label: 'WHATSAPP E CENTRAL',
+                  value: '+55 19 99543-6548',
+                ),
+                SizedBox(height: 14),
+                _SupportScheduleCard(),
+              ],
+            ),
           ),
         ),
       ),

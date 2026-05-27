@@ -224,7 +224,7 @@ class _AttendantChatDetailScreenState extends State<AttendantChatDetailScreen> {
               ),
               _Composer(
                 controller: _viewModel.messageController,
-                isEnabled: !_viewModel.isClosing,
+                isEnabled: !_viewModel.isClosing && !_viewModel.isSending,
                 onSend: () => _viewModel.sendMessage(),
               ),
             ],

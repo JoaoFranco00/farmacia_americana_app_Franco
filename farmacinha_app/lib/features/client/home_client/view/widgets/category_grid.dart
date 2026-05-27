@@ -4,7 +4,7 @@ import 'package:farmacia_app/features/client/home_client/data/models/category_mo
 
 class CategoryGrid extends StatelessWidget {
   final List<Category> categories;
-  final Function(String) onCategoryTap;
+  final ValueChanged<Category> onCategoryTap;
 
   const CategoryGrid({
     super.key,
@@ -29,7 +29,7 @@ class CategoryGrid extends StatelessWidget {
         final category = categories[index];
         return _CategoryCard(
           category: category,
-          onTap: () => onCategoryTap(category.id),
+          onTap: () => onCategoryTap(category),
         );
       },
     );
@@ -80,4 +80,3 @@ class _CategoryCard extends StatelessWidget {
     );
   }
 }
-

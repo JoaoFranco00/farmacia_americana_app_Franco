@@ -20,12 +20,15 @@ class AttendantChatDetailViewModel extends ChangeNotifier {
   String? _selectedClientId;
   bool _isLoading = false;
   bool _isClosing = false;
+  bool _isSending = false;
   bool _isRefreshing = false;
+  bool _disposed = false;
   String? _errorMessage;
 
   AttendantConversation? get currentConversation => _currentConversation;
   bool get isLoading => _isLoading;
   bool get isClosing => _isClosing;
+  bool get isSending => _isSending;
   String? get errorMessage => _errorMessage;
 
   Future<void> initialize(String? clientId) async {
@@ -36,6 +39,10 @@ class AttendantChatDetailViewModel extends ChangeNotifier {
   }
 
   Future<void> refresh({bool showLoading = true}) async {
+    if (_disposed) {
+      return;
+    }
+
     if (_isRefreshing) {
       return;
     }
@@ -44,7 +51,7 @@ class AttendantChatDetailViewModel extends ChangeNotifier {
     _errorMessage = null;
     if (showLoading) {
       _isLoading = true;
-      notifyListeners();
+      _safeNotifyListeners();
     }
 
     try {
@@ -93,7 +100,7 @@ class AttendantChatDetailViewModel extends ChangeNotifier {
       if (showLoading) {
         _isLoading = false;
       }
-      notifyListeners();
+      _safeNotifyListeners();
     }
   }
 
@@ -103,8 +110,12 @@ class AttendantChatDetailViewModel extends ChangeNotifier {
   }
 
   Future<void> sendMessage() async {
+    if (_disposed) {
+      return;
+    }
+
     final draft = messageController.text.trim();
-    if (draft.isEmpty || _isClosing) {
+    if (draft.isEmpty || _isClosing || _isSending) {
       return;
     }
 
@@ -113,13 +124,30 @@ class AttendantChatDetailViewModel extends ChangeNotifier {
       return;
     }
 
+    _isSending = true;
+    _errorMessage = null;
+    messageController.clear();
+    _safeNotifyListeners();
+
     try {
       await _repository.sendAttendantText(clientId: clientId, text: draft);
-      messageController.clear();
       await refresh();
     } catch (error) {
+      if (_disposed) {
+        return;
+      }
+
+      messageController.text = draft;
+      messageController.selection = TextSelection.collapsed(
+        offset: messageController.text.length,
+      );
       _errorMessage = error.toString().replaceFirst('Exception: ', '');
-      notifyListeners();
+      _safeNotifyListeners();
+    } finally {
+      if (!_disposed) {
+        _isSending = false;
+        _safeNotifyListeners();
+      }
     }
   }
 
@@ -131,13 +159,17 @@ class AttendantChatDetailViewModel extends ChangeNotifier {
 
     _isClosing = true;
     _errorMessage = null;
-    notifyListeners();
+    _safeNotifyListeners();
 
     try {
       await _repository.closeConversationAsAttendant(
         clientId: clientId,
         closingMessage: _closingMessage,
       );
+      if (_disposed) {
+        return false;
+      }
+
       messageController.clear();
       _currentConversation = null;
       _selectedClientId = null;
@@ -146,8 +178,10 @@ class AttendantChatDetailViewModel extends ChangeNotifier {
       _errorMessage = error.toString().replaceFirst('Exception: ', '');
       return false;
     } finally {
-      _isClosing = false;
-      notifyListeners();
+      if (!_disposed) {
+        _isClosing = false;
+        _safeNotifyListeners();
+      }
     }
   }
 
@@ -233,14 +267,22 @@ class AttendantChatDetailViewModel extends ChangeNotifier {
 
   void _startRefreshPolling() {
     _refreshTimer?.cancel();
-    _refreshTimer = Timer.periodic(
-      const Duration(seconds: 2),
-      (_) => unawaited(refresh(showLoading: false)),
-    );
+    _refreshTimer = Timer.periodic(const Duration(seconds: 2), (_) {
+      if (!_disposed) {
+        unawaited(refresh(showLoading: false));
+      }
+    });
+  }
+
+  void _safeNotifyListeners() {
+    if (!_disposed) {
+      notifyListeners();
+    }
   }
 
   @override
   void dispose() {
+    _disposed = true;
     messageController.dispose();
     _refreshTimer?.cancel();
     _refreshTimer = null;

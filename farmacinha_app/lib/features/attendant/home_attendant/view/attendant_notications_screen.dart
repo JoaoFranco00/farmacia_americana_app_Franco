@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:farmacia_app/app/app_routes.dart';
 import 'package:farmacia_app/core/palette/pallete.dart';
 import 'package:farmacia_app/features/attendant/home_attendant/data/models/attendant_notification_model.dart';
+import 'package:farmacia_app/features/attendant/home_attendant/view/utils/attendant_navigation.dart';
 import 'package:farmacia_app/features/support/data/repositories/support_chat_repository.dart';
 
 class AttendantNotificationsScreen extends StatefulWidget {
@@ -45,132 +46,145 @@ class _AttendantNotificationsScreenState
   }
 
   void _reloadNotifications() {
+    if (!mounted) {
+      return;
+    }
+
     setState(() {
       _notificationsFuture = _loadNotifications();
     });
   }
 
+  void _closeScreen() {
+    popOrGoToAttendantHome(context);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F7),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        surfaceTintColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Pallete.primaryRed),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        title: const Text(
-          'Notifica\u00e7\u00f5es',
-          style: TextStyle(
-            color: Color(0xFF151515),
-            fontWeight: FontWeight.w700,
-            fontSize: 25,
+    return PopScope<Object?>(
+      canPop: Navigator.of(context).canPop(),
+      onPopInvokedWithResult: (didPop, result) =>
+          handleAttendantBack(context, didPop),
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF5F5F7),
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          surfaceTintColor: Colors.white,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Pallete.primaryRed),
+            onPressed: _closeScreen,
           ),
-        ),
-        actions: const [
-          Padding(
-            padding: EdgeInsets.only(right: 16),
-            child: Center(
-              child: Text(
-                'Ultimas\nmensagens',
-                style: TextStyle(
-                  color: Pallete.primaryRed,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14,
+          title: const Text(
+            'Notifica\u00e7\u00f5es',
+            style: TextStyle(
+              color: Color(0xFF151515),
+              fontWeight: FontWeight.w700,
+              fontSize: 25,
+            ),
+          ),
+          actions: const [
+            Padding(
+              padding: EdgeInsets.only(right: 16),
+              child: Center(
+                child: Text(
+                  'Ultimas\nmensagens',
+                  style: TextStyle(
+                    color: Pallete.primaryRed,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                  ),
                 ),
               ),
             ),
+          ],
+        ),
+        body: SafeArea(
+          child: FutureBuilder<List<AttendantNotification>>(
+            future: _notificationsFuture,
+            builder: (context, snapshot) {
+              final notifications =
+                  snapshot.data ?? const <AttendantNotification>[];
+
+              return SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'ATENDIMENTO',
+                      style: TextStyle(
+                        color: Pallete.primaryRed,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 1.6,
+                        fontSize: 13,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'Pedidos de Atendimento',
+                      style: TextStyle(
+                        color: Color(0xFF161616),
+                        fontWeight: FontWeight.w800,
+                        fontSize: 26,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    if (snapshot.connectionState == ConnectionState.waiting)
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 32),
+                        child: Center(child: CircularProgressIndicator()),
+                      )
+                    else if (snapshot.hasError)
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 32),
+                        child: Center(
+                          child: Text(
+                            'Não foi possível carregar as notificações.',
+                          ),
+                        ),
+                      )
+                    else if (notifications.isEmpty)
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 32),
+                        child: Center(
+                          child: Text(
+                            'Nenhum pedido de atendimento por enquanto.',
+                          ),
+                        ),
+                      )
+                    else
+                      ...notifications.asMap().entries.map((entry) {
+                        final index = entry.key;
+                        final notification = entry.value;
+
+                        return Padding(
+                          padding: EdgeInsets.only(
+                            bottom: index == notifications.length - 1 ? 0 : 16,
+                          ),
+                          child: _UrgentCard(
+                            notification: notification,
+                            onActionPressed: notification.chatId == null
+                                ? null
+                                : () async {
+                                    await Navigator.pushNamed(
+                                      context,
+                                      AppRoutes.attendantChatDetail,
+                                      arguments: notification.chatId,
+                                    );
+                                    if (!context.mounted) {
+                                      return;
+                                    }
+                                    _reloadNotifications();
+                                  },
+                          ),
+                        );
+                      }),
+                  ],
+                ),
+              );
+            },
           ),
-        ],
-      ),
-      body: SafeArea(
-        child: FutureBuilder<List<AttendantNotification>>(
-          future: _notificationsFuture,
-          builder: (context, snapshot) {
-            final notifications =
-                snapshot.data ?? const <AttendantNotification>[];
-
-            return SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'ATENDIMENTO',
-                    style: TextStyle(
-                      color: Pallete.primaryRed,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 1.6,
-                      fontSize: 13,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Pedidos de Atendimento',
-                    style: TextStyle(
-                      color: Color(0xFF161616),
-                      fontWeight: FontWeight.w800,
-                      fontSize: 26,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  if (snapshot.connectionState == ConnectionState.waiting)
-                    const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 32),
-                      child: Center(child: CircularProgressIndicator()),
-                    )
-                  else if (snapshot.hasError)
-                    const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 32),
-                      child: Center(
-                        child: Text(
-                          'Não foi possível carregar as notificações.',
-                        ),
-                      ),
-                    )
-                  else if (notifications.isEmpty)
-                    const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 32),
-                      child: Center(
-                        child: Text(
-                          'Nenhum pedido de atendimento por enquanto.',
-                        ),
-                      ),
-                    )
-                  else
-                    ...notifications.asMap().entries.map((entry) {
-                      final index = entry.key;
-                      final notification = entry.value;
-
-                      return Padding(
-                        padding: EdgeInsets.only(
-                          bottom: index == notifications.length - 1 ? 0 : 16,
-                        ),
-                        child: _UrgentCard(
-                          notification: notification,
-                          onActionPressed: notification.chatId == null
-                              ? null
-                              : () async {
-                                  await Navigator.pushNamed(
-                                    context,
-                                    AppRoutes.attendantChatDetail,
-                                    arguments: notification.chatId,
-                                  );
-                                  if (!context.mounted) {
-                                    return;
-                                  }
-                                  _reloadNotifications();
-                                },
-                        ),
-                      );
-                    }),
-                ],
-              ),
-            );
-          },
         ),
       ),
     );

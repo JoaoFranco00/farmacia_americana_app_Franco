@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:farmacia_app/app/app_routes.dart';
+import 'package:farmacia_app/features/client/search/data/models/search_result_arguments.dart';
 import '../view_model/search_result_view_model.dart';
 import 'package:farmacia_app/features/client/widgets/custom_app_bar.dart';
 import 'package:farmacia_app/features/client/widgets/custom_bottom_nav_bar.dart';
@@ -8,17 +9,20 @@ import 'package:farmacia_app/features/client/home_client/view/widgets/product_ca
 
 class SearchResultScreen extends StatelessWidget {
   final String? query;
+  final SearchResultArguments? arguments;
 
-  const SearchResultScreen({super.key, this.query});
+  const SearchResultScreen({super.key, this.query, this.arguments});
 
   @override
   Widget build(BuildContext context) {
-    // Se a busca veio pela rota, pego o texto dos argumentos.
-    final String effectiveQuery =
-        query ?? ModalRoute.of(context)!.settings.arguments as String;
+    final effectiveArguments = arguments ?? _argumentsFrom(context);
 
     return ChangeNotifierProvider(
-      create: (_) => SearchResultViewModel(initialQuery: effectiveQuery),
+      create: (_) => SearchResultViewModel(
+        initialQuery: effectiveArguments.query,
+        initialCategoryId: effectiveArguments.categoryId,
+        initialCategoryName: effectiveArguments.categoryName,
+      ),
       child: Scaffold(
         appBar: CustomAppBar(
           onMenuTap: () => Navigator.pop(context),
@@ -42,7 +46,7 @@ class SearchResultScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Resultados para: ${viewModel.searchQuery}",
+                    viewModel.resultsTitle,
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -78,7 +82,8 @@ class SearchResultScreen extends StatelessWidget {
                             arguments: product,
                           );
                         },
-                        onAddToCart: () => viewModel.addToCart(context, product),
+                        onAddToCart: () =>
+                            viewModel.addToCart(context, product),
                       );
                     },
                   ),
@@ -143,6 +148,24 @@ class SearchResultScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  SearchResultArguments _argumentsFrom(BuildContext context) {
+    if (query != null) {
+      return SearchResultArguments.query(query!);
+    }
+
+    final routeArguments = ModalRoute.of(context)?.settings.arguments;
+
+    if (routeArguments is SearchResultArguments) {
+      return routeArguments;
+    }
+
+    if (routeArguments is String) {
+      return SearchResultArguments.query(routeArguments);
+    }
+
+    return const SearchResultArguments.query('');
   }
 
   Widget _buildEmptyState() {

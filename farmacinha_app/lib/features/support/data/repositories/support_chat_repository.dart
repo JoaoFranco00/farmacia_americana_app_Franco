@@ -329,34 +329,41 @@ class SupportChatRepository {
           ),
       };
 
-      return messages
-          .map((message) {
-            final conversationId = (message['conversation_id'] ?? '')
-                .toString();
-            final conversation = conversationsById[conversationId];
-            final body = (message['body'] ?? '').toString().trim();
+      final seenConversationIds = <String>{};
+      final notifications = <SupportHumanRequestNotification>[];
 
-            return SupportHumanRequestNotification(
-              id: (message['id'] ?? '').toString(),
-              conversationId: conversationId,
-              clientId: conversation?.clientId ?? '',
-              clientName: conversation?.clientName ?? 'Cliente',
-              preview: body.isEmpty
-                  ? 'Cliente solicitou atendimento humano.'
-                  : body,
-              isUrgent: conversation?.isUrgent ?? false,
-              createdAt:
-                  tryParseUtcToLocal(message['created_at']?.toString()) ??
-                  DateTime.now(),
-            );
-          })
-          .where(
-            (notification) =>
-                notification.clientId.isNotEmpty &&
-                conversationsById[notification.conversationId]?.attendantId ==
-                    null,
-          )
-          .toList(growable: false);
+      for (final message in messages) {
+        final conversationId = (message['conversation_id'] ?? '').toString();
+        final conversation = conversationsById[conversationId];
+
+        if (conversation == null ||
+            conversation.clientId.isEmpty ||
+            conversation.attendantId != null ||
+            conversation.status != 'novo' ||
+            !seenConversationIds.add(conversationId)) {
+          continue;
+        }
+
+        final body = (message['body'] ?? '').toString().trim();
+
+        notifications.add(
+          SupportHumanRequestNotification(
+            id: (message['id'] ?? '').toString(),
+            conversationId: conversationId,
+            clientId: conversation.clientId,
+            clientName: conversation.clientName,
+            preview: body.isEmpty
+                ? 'Cliente solicitou atendimento humano.'
+                : body,
+            isUrgent: conversation.isUrgent,
+            createdAt:
+                tryParseUtcToLocal(message['created_at']?.toString()) ??
+                DateTime.now(),
+          ),
+        );
+      }
+
+      return notifications;
     } on PostgrestException catch (error) {
       throw Exception(_formatSchemaError(error));
     }
@@ -373,27 +380,19 @@ class SupportChatRepository {
 
     final existing = await fetchCurrentClientConversation();
 
-    String conversationId;
-
     if (existing == null) {
-      final created = await _client
-          .from(_conversationTable)
-          .insert({
-            'client_id': authUser.id,
-            'status': 'novo',
-            'is_urgent': urgent,
-            'last_message_preview':
-                systemMessage ??
-                (urgent
-                    ? 'Cliente solicitou atendimento humano com urgencia.'
-                    : 'Cliente solicitou atendimento humano.'),
-            'last_message_at': nowUtc().toIso8601String(),
-          })
-          .select()
-          .single();
-      conversationId = (created['id'] ?? '').toString();
+      await _client.from(_conversationTable).insert({
+        'client_id': authUser.id,
+        'status': 'novo',
+        'is_urgent': urgent,
+        'last_message_preview':
+            systemMessage ??
+            (urgent
+                ? 'Cliente solicitou atendimento humano com urgencia.'
+                : 'Cliente solicitou atendimento humano.'),
+        'last_message_at': nowUtc().toIso8601String(),
+      });
     } else {
-      conversationId = existing.id;
       await _client
           .from(_conversationTable)
           .update({

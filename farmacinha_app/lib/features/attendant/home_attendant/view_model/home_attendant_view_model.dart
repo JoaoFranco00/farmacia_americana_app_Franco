@@ -29,6 +29,7 @@ class HomeAttendantViewModel extends ChangeNotifier {
   int _currentTab = 0;
   int _notificationsCount = 0;
   bool _isLoading = false;
+  bool _disposed = false;
   String? _errorMessage;
 
   List<AttendantChat> get chats => _filteredChats;
@@ -41,18 +42,29 @@ class HomeAttendantViewModel extends ChangeNotifier {
 
   Future<void> initialize() async {
     await refresh();
+    if (_disposed) {
+      return;
+    }
     _subscribeToRealtime();
   }
 
   Future<void> refresh() async {
+    if (_disposed) {
+      return;
+    }
+
     _isLoading = true;
     _errorMessage = null;
-    notifyListeners();
+    _safeNotifyListeners();
 
     try {
       final conversations = await _repository.fetchAttendantInbox();
       final notifications = await _repository
           .fetchRecentHumanRequestNotifications(limit: 20);
+      if (_disposed) {
+        return;
+      }
+
       _notificationsCount = notifications.length;
       _allChats = conversations
           .map(
@@ -77,7 +89,7 @@ class HomeAttendantViewModel extends ChangeNotifier {
       _errorMessage = error.toString().replaceFirst('Exception: ', '');
     } finally {
       _isLoading = false;
-      notifyListeners();
+      _safeNotifyListeners();
     }
   }
 
@@ -88,7 +100,7 @@ class HomeAttendantViewModel extends ChangeNotifier {
 
   void setTab(int index) {
     _currentTab = index;
-    notifyListeners();
+    _safeNotifyListeners();
   }
 
   void _applyFilters({bool notify = true}) {
@@ -106,7 +118,7 @@ class HomeAttendantViewModel extends ChangeNotifier {
         .toList(growable: false);
 
     if (notify) {
-      notifyListeners();
+      _safeNotifyListeners();
     }
   }
 
@@ -127,7 +139,7 @@ class HomeAttendantViewModel extends ChangeNotifier {
   }
 
   void _subscribeToRealtime() {
-    if (_channel != null) {
+    if (_disposed || _channel != null) {
       return;
     }
 
@@ -154,6 +166,10 @@ class HomeAttendantViewModel extends ChangeNotifier {
   Future<void> _handleSupportRequestMessage(
     PostgresChangePayload payload,
   ) async {
+    if (_disposed) {
+      return;
+    }
+
     if (payload.eventType != PostgresChangeEvent.insert) {
       return;
     }
@@ -169,7 +185,7 @@ class HomeAttendantViewModel extends ChangeNotifier {
     final conversation = await _repository.fetchConversationById(
       conversationId,
     );
-    if (conversation == null) {
+    if (_disposed || conversation == null) {
       return;
     }
 
@@ -192,6 +208,12 @@ class HomeAttendantViewModel extends ChangeNotifier {
             DateTime.now(),
       ),
     );
+  }
+
+  void _safeNotifyListeners() {
+    if (!_disposed) {
+      notifyListeners();
+    }
   }
 
   String _formatInboxTimestamp(SupportConversationRecord conversation) {
@@ -224,6 +246,7 @@ class HomeAttendantViewModel extends ChangeNotifier {
 
   @override
   void dispose() {
+    _disposed = true;
     searchController.dispose();
     final channel = _channel;
     _channel = null;

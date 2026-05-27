@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:farmacia_app/app/app_routes.dart';
 import 'package:farmacia_app/core/palette/pallete.dart';
 import 'package:farmacia_app/features/attendant/home_attendant/data/models/attendant_search_client_model.dart';
+import 'package:farmacia_app/features/attendant/home_attendant/view/utils/attendant_navigation.dart';
 import 'package:farmacia_app/features/attendant/home_attendant/view_model/attendant_chat_view_model.dart';
 import 'package:farmacia_app/features/support/data/repositories/support_chat_repository.dart';
 
@@ -51,183 +52,196 @@ class _AttendantChatScreenState extends State<AttendantChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFE9E9E9),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFFF4F4F4),
-        elevation: 0,
-        surfaceTintColor: const Color(0xFFF4F4F4),
-        automaticallyImplyLeading: false,
-        titleSpacing: 16,
-        title: const Row(
-          children: [
-            Text(
-              'FARMACIA AMERICANA',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w800,
-                color: Color(0xFFB80000),
+    return PopScope<Object?>(
+      canPop: Navigator.of(context).canPop(),
+      onPopInvokedWithResult: (didPop, result) =>
+          handleAttendantBack(context, didPop),
+      child: Scaffold(
+        backgroundColor: const Color(0xFFE9E9E9),
+        appBar: AppBar(
+          backgroundColor: const Color(0xFFF4F4F4),
+          elevation: 0,
+          surfaceTintColor: const Color(0xFFF4F4F4),
+          automaticallyImplyLeading: false,
+          titleSpacing: 16,
+          title: const Row(
+            children: [
+              Text(
+                'FARMACIA AMERICANA',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w800,
+                  color: Color(0xFFB80000),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            Padding(
+              padding: const EdgeInsets.only(right: 16),
+              child: IconButton(
+                icon: const Icon(
+                  Icons.notifications,
+                  color: Color(0xFF101828),
+                  size: 28,
+                ),
+                onPressed: () {
+                  Navigator.pushNamed(
+                    context,
+                    AppRoutes.attendantNotifications,
+                  );
+                },
               ),
             ),
           ],
         ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16),
-            child: IconButton(
-              icon: const Icon(
-                Icons.notifications,
-                color: Color(0xFF101828),
-                size: 28,
-              ),
-              onPressed: () {
-                Navigator.pushNamed(context, AppRoutes.attendantNotifications);
-              },
-            ),
-          ),
-        ],
-      ),
-      body: ListenableBuilder(
-        listenable: _viewModel,
-        builder: (context, _) {
-          return SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(16, 20, 16, 32),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (_viewModel.errorMessage != null) ...[
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFFE7E7),
-                      borderRadius: BorderRadius.circular(12),
+        body: ListenableBuilder(
+          listenable: _viewModel,
+          builder: (context, _) {
+            return SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(16, 20, 16, 32),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (_viewModel.errorMessage != null) ...[
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFFE7E7),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        _viewModel.errorMessage!,
+                        style: const TextStyle(
+                          color: Pallete.primaryRed,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
                     ),
-                    child: Text(
-                      _viewModel.errorMessage!,
-                      style: const TextStyle(
-                        color: Pallete.primaryRed,
-                        fontWeight: FontWeight.w700,
+                    const SizedBox(height: 18),
+                  ],
+                  const Text(
+                    'ATENDIMENTO AO CLIENTE',
+                    style: TextStyle(
+                      color: Color(0xFFB80000),
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 2.0,
+                      fontSize: 12,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  const Text(
+                    'Conversas Ativas',
+                    style: TextStyle(
+                      fontSize: 21.5,
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF161A1D),
+                    ),
+                  ),
+                  Container(
+                    margin: const EdgeInsets.only(top: 12, bottom: 24),
+                    width: 82,
+                    height: 5,
+                    color: const Color(0xFFF2C500),
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: TextField(
+                      controller: _viewModel.searchController,
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 16,
+                        ),
+                        prefixIcon: Icon(
+                          Icons.search,
+                          color: Color(0xFF6E4B4B),
+                        ),
+                        hintText: 'Buscar paciente ou pedido...',
+                        hintStyle: TextStyle(
+                          color: Color(0xFF9A9A9A),
+                          fontSize: 16,
+                        ),
                       ),
                     ),
                   ),
                   const SizedBox(height: 18),
+                  if (_viewModel.isLoading)
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 24),
+                      child: Center(child: CircularProgressIndicator()),
+                    )
+                  else if (_viewModel.clients.isEmpty)
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 24),
+                      child: Center(
+                        child: Text('Nenhuma conversa encontrada.'),
+                      ),
+                    )
+                  else
+                    ..._viewModel.clients.map(
+                      (client) => Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: _ChatClientCard(
+                          client: client,
+                          isSelected: _viewModel.selectedClientId == client.id,
+                          onTap: () {
+                            _viewModel.selectClient(client.id);
+                            Navigator.pushNamed(
+                              context,
+                              AppRoutes.attendantChatDetail,
+                              arguments: client.id,
+                            );
+                          },
+                        ),
+                      ),
+                    ),
                 ],
-                const Text(
-                  'ATENDIMENTO AO CLIENTE',
-                  style: TextStyle(
-                    color: Color(0xFFB80000),
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 2.0,
-                    fontSize: 12,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                const Text(
-                  'Conversas Ativas',
-                  style: TextStyle(
-                    fontSize: 21.5,
-                    fontWeight: FontWeight.w800,
-                    color: Color(0xFF161A1D),
-                  ),
-                ),
-                Container(
-                  margin: const EdgeInsets.only(top: 12, bottom: 24),
-                  width: 82,
-                  height: 5,
-                  color: const Color(0xFFF2C500),
-                ),
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: TextField(
-                    controller: _viewModel.searchController,
-                    decoration: const InputDecoration(
-                      border: InputBorder.none,
-                      contentPadding: EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 16,
-                      ),
-                      prefixIcon: Icon(Icons.search, color: Color(0xFF6E4B4B)),
-                      hintText: 'Buscar paciente ou pedido...',
-                      hintStyle: TextStyle(
-                        color: Color(0xFF9A9A9A),
-                        fontSize: 16,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 18),
-                if (_viewModel.isLoading)
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 24),
-                    child: Center(child: CircularProgressIndicator()),
-                  )
-                else if (_viewModel.clients.isEmpty)
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 24),
-                    child: Center(child: Text('Nenhuma conversa encontrada.')),
-                  )
-                else
-                  ..._viewModel.clients.map(
-                    (client) => Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: _ChatClientCard(
-                        client: client,
-                        isSelected: _viewModel.selectedClientId == client.id,
-                        onTap: () {
-                          _viewModel.selectClient(client.id);
-                          Navigator.pushNamed(
-                            context,
-                            AppRoutes.attendantChatDetail,
-                            arguments: client.id,
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-          );
-        },
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 2,
-        onTap: (index) {
-          if (index == 0) {
-            Navigator.pushReplacementNamed(context, AppRoutes.homeAttendant);
-            return;
-          }
-
-          if (index == 1) {
-            Navigator.pushReplacementNamed(
-              context,
-              AppRoutes.attendantProductRegistration,
+              ),
             );
-            return;
-          }
+          },
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+          currentIndex: 2,
+          onTap: (index) {
+            if (index == 0) {
+              Navigator.pushReplacementNamed(context, AppRoutes.homeAttendant);
+              return;
+            }
 
-          if (index == 3) {
-            Navigator.pushNamed(context, AppRoutes.attendantProfile);
-          }
-        },
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: Pallete.primaryRed,
-        unselectedItemColor: const Color(0xFF707A89),
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_rounded),
-            label: 'Inicio',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.inventory_2_rounded),
-            label: 'Estoque',
-          ),
-          BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'Chat'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
-        ],
+            if (index == 1) {
+              Navigator.pushReplacementNamed(
+                context,
+                AppRoutes.attendantProductRegistration,
+              );
+              return;
+            }
+
+            if (index == 3) {
+              Navigator.pushNamed(context, AppRoutes.attendantProfile);
+            }
+          },
+          type: BottomNavigationBarType.fixed,
+          selectedItemColor: Pallete.primaryRed,
+          unselectedItemColor: const Color(0xFF707A89),
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home_rounded),
+              label: 'Inicio',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.inventory_2_rounded),
+              label: 'Estoque',
+            ),
+            BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'Chat'),
+            BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
+          ],
+        ),
       ),
     );
   }

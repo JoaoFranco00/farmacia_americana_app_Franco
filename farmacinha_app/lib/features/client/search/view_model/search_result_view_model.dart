@@ -8,11 +8,18 @@ import 'package:flutter/material.dart';
 class SearchResultViewModel extends ChangeNotifier {
   SearchResultViewModel({
     String? initialQuery,
+    String? initialCategoryId,
+    String? initialCategoryName,
     AuthSessionViewModel? authSession,
     SearchAiService? searchAiService,
   }) : _authSession = authSession ?? AuthSessionViewModel.instance,
        _searchAiService = searchAiService ?? SearchAiService() {
-    if (initialQuery != null && initialQuery.isNotEmpty) {
+    if (initialCategoryId != null && initialCategoryId.isNotEmpty) {
+      filterByCategory(
+        categoryId: initialCategoryId,
+        categoryName: initialCategoryName ?? initialCategoryId,
+      );
+    } else if (initialQuery != null && initialQuery.isNotEmpty) {
       search(initialQuery);
     }
   }
@@ -22,6 +29,7 @@ class SearchResultViewModel extends ChangeNotifier {
   List<Product> filteredProducts = [];
   List<Product> similarProducts = [];
   String searchQuery = '';
+  String resultsTitle = 'Resultados';
   bool isLoading = false;
   bool usedAiSearch = false;
   bool _disposed = false;
@@ -31,12 +39,14 @@ class SearchResultViewModel extends ChangeNotifier {
 
     isLoading = true;
     searchQuery = trimmedQuery;
+    resultsTitle = 'Resultados para: $trimmedQuery';
     usedAiSearch = false;
     safeNotifyListeners();
 
     if (trimmedQuery.isEmpty) {
       filteredProducts = [];
       similarProducts = [];
+      resultsTitle = 'Resultados';
       isLoading = false;
       safeNotifyListeners();
       return;
@@ -105,9 +115,55 @@ class SearchResultViewModel extends ChangeNotifier {
       similarProducts = [];
       usedAiSearch = false;
     } finally {
+      if (!_disposed) {
+        isLoading = false;
+        safeNotifyListeners();
+      }
+    }
+  }
+
+  Future<void> filterByCategory({
+    required String categoryId,
+    required String categoryName,
+  }) async {
+    final trimmedCategoryId = categoryId.trim();
+
+    isLoading = true;
+    searchQuery = categoryName.trim();
+    resultsTitle = trimmedCategoryId.toLowerCase() == 'all'
+        ? 'Todos os produtos'
+        : 'Categoria: ${categoryName.trim()}';
+    usedAiSearch = false;
+    safeNotifyListeners();
+
+    try {
+      final allProducts = await ProductsRepository.instance
+          .fetchActiveProducts();
       if (_disposed) return;
-      isLoading = false;
-      safeNotifyListeners();
+
+      if (trimmedCategoryId.toLowerCase() == 'all') {
+        filteredProducts = allProducts;
+      } else {
+        filteredProducts = allProducts
+            .where(
+              (product) =>
+                  product.category.toLowerCase() ==
+                  trimmedCategoryId.toLowerCase(),
+            )
+            .toList(growable: false);
+      }
+
+      similarProducts = [];
+    } catch (error) {
+      debugPrint('Erro ao filtrar produtos por categoria no Supabase: $error');
+      if (_disposed) return;
+      filteredProducts = [];
+      similarProducts = [];
+    } finally {
+      if (!_disposed) {
+        isLoading = false;
+        safeNotifyListeners();
+      }
     }
   }
 

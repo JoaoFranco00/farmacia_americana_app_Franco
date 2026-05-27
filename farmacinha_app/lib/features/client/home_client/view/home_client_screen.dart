@@ -10,6 +10,7 @@ import 'package:farmacia_app/features/client/home_client/view/widgets/category_g
 import 'package:farmacia_app/features/client/account/view/account_screen.dart';
 import 'package:farmacia_app/features/client/notifications/view/notifications_screen.dart';
 import 'package:farmacia_app/features/client/notifications/view_model/notifications_view_model.dart';
+import 'package:farmacia_app/features/client/search/data/models/search_result_arguments.dart';
 
 class HomeClientScreen extends StatefulWidget {
   const HomeClientScreen({super.key});
@@ -152,11 +153,14 @@ class _HomeClientScreenState extends State<HomeClientScreen> {
 
                   CategoryGrid(
                     categories: viewModel.categories,
-                    onCategoryTap: (categoryName) {
+                    onCategoryTap: (category) {
                       Navigator.pushNamed(
                         context,
                         AppRoutes.searchResult,
-                        arguments: categoryName,
+                        arguments: SearchResultArguments.category(
+                          categoryId: category.id,
+                          categoryName: category.name,
+                        ),
                       );
                     },
                   ),
